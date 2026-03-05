@@ -1,0 +1,33 @@
+<!--pages/notes/editor-details.wxml-->
+<view class="page">
+  <view class="page-header">
+    <view>
+      <view class="page-title">预览笔记</view>
+      <view class="page-subtitle text-muted">
+        确认无误后发布到云端
+      </view>
+    </view>
+  </view>
+  <view class="section">
+    <view class="card">
+      <view class="section-title">标题</view>
+      <view class="note-title">{{title || '未命名笔记'}}</view>
+      <view class="section-title" style="margin-top: 24rpx;">摘要</view>
+      <view class="note-snippet">
+        {{content || '暂无摘要'}}
+      </view>
+    </view>
+  </view>
+  <view class="section">
+    <view class="card">
+      <view class="section-title">正文预览</view>
+      <rich-text class="note-content" nodes="{{html}}"></rich-text>
+    </view>
+  </view>
+  <view class="fixed-footer">
+    <view class="btn-group">
+      <button class="btn-secondary" bindtap="back">返回编辑</button>
+      <button class="btn-primary" bindtap="submit">发布至云端</button>
+    </view>
+  </view>
+</view>

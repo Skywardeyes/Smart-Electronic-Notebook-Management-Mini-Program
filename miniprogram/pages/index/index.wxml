@@ -1,0 +1,37 @@
+<view class="page">
+  <view class="page-header">
+    <view>
+      <view class="page-title">云笔记</view>
+      <view class="page-subtitle">轻量、优雅的云端笔记本</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card hero-card">
+      <view class="hero-title">随时随地记录灵感</view>
+      <view class="hero-desc">支持富文本编辑、图片插入和云端同步。</view>
+      <view class="btn-group hero-actions">
+        <button class="btn-primary" bindtap="goEditor">新建笔记</button>
+        <button class="btn-secondary" bindtap="getNoteData">查看全部</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="section quick-actions">
+    <view class="section-title">快速操作</view>
+    <view class="quick-grid">
+      <view class="quick-item" bindtap="goEditor">
+        <view class="quick-icon quick-icon-primary">+</view>
+        <view class="quick-text">空白笔记</view>
+      </view>
+      <view class="quick-item" bindtap="getNoteData">
+        <view class="quick-icon">☰</view>
+        <view class="quick-text">云端笔记</view>
+      </view>
+      <view class="quick-item" bindtap="goRichEditor">
+        <view class="quick-icon">Aa</view>
+        <view class="quick-text">富文本示例</view>
+      </view>
+    </view>
+  </view>
+</view>

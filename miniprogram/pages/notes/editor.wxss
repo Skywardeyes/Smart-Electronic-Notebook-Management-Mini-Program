@@ -1,0 +1,46 @@
+@import "../../iconfont/iconfont.wxss";
+
+.editor-page-header {
+  margin-bottom: 24rpx;
+}
+
+.editor-form-card {
+  margin-bottom: 24rpx;
+}
+
+.editor-toolbar-card {
+  margin-bottom: 140rpx;
+}
+
+.editor-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.editor-toolbar-wrapper {
+  padding-bottom: 12rpx;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 8rpx;
+  overflow-x: scroll;
+  white-space: nowrap;
+}
+
+.editor-toolbar-wrapper .iconfont {
+  padding: 12rpx;
+  font-size: 32rpx;
+}
+
+.ql-container {
+  box-sizing: border-box;
+  padding: 20rpx 20rpx 80rpx;
+  width: 100%;
+  min-height: 50vh;
+  background: #ffffff;
+  border-radius: 12rpx;
+  border: 1px solid #e5e7eb;
+}
+
+.ql-active {
+  color: #2563eb;
+}

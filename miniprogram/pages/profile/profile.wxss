@@ -1,0 +1,67 @@
+/* pages/profile/profile.wxss */
+
+.profile-header {
+  display: flex;
+  align-items: center;
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.nickname {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 6rpx;
+}
+
+.wechat-id {
+  font-size: 24rpx;
+}
+
+.edit-btn {
+  margin-top: 10rpx;
+}
+
+.stats-card {
+  display: flex;
+  justify-content: space-between;
+}
+
+.stats-item {
+  flex: 1;
+  align-items: center;
+  text-align: center;
+}
+
+.stats-number {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.stats-label {
+  font-size: 24rpx;
+  color: #999999;
+  margin-top: 4rpx;
+}
+
+.menu-card .menu-item {
+  padding: 20rpx 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 28rpx;
+}
+
+.menu-card .menu-item:last-child {
+  border-bottom: none;
+}
+
+.logout-btn {
+  width: 100%;
+}

@@ -1,0 +1,68 @@
+<view class="page-container">
+  <view class="page-header">
+    <view>
+      <view class="page-title">我的</view>
+      <view class="page-subtitle">个人信息与数据总览</view>
+    </view>
+    <button class="btn-secondary btn-small" bindtap="onTapSetting">设置</button>
+  </view>
+
+  <view class="section">
+    <view class="card profile-header">
+      <image class="avatar" src="{{userInfo.avatarUrl}}" mode="aspectFill"></image>
+      <view class="profile-info">
+        <view class="nickname">{{userInfo.nickName || '未登录用户'}}</view>
+        <view class="wechat-id text-muted">微信号：{{userInfo.wechatId || '—'}}</view>
+        <button class="btn-secondary btn-small edit-btn" bindtap="onTapSetting">编辑资料</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card stats-card">
+      <view class="stats-item">
+        <view class="stats-number">{{stats.totalNotes}}</view>
+        <view class="stats-label">笔记总数</view>
+      </view>
+      <view class="stats-item">
+        <view class="stats-number">{{stats.thisMonthNew}}</view>
+        <view class="stats-label">本月新增</view>
+      </view>
+      <view class="stats-item">
+        <view class="stats-number">{{stats.aiUsage}}</view>
+        <view class="stats-label">AI 使用次数</view>
+      </view>
+      <view class="stats-item">
+        <view class="stats-number">{{stats.storageUsage}}</view>
+        <view class="stats-label">存储空间</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card menu-card">
+      <view class="menu-item" data-action="分类管理" bindtap="onTapMenu">
+        <text>我的分类</text>
+      </view>
+      <view class="menu-item" data-action="标签管理" bindtap="onTapMenu">
+        <text>标签管理</text>
+      </view>
+      <view class="menu-item" data-action="回收站" bindtap="onTapMenu">
+        <text>回收站</text>
+      </view>
+      <view class="menu-item" data-action="设置" bindtap="onTapMenu">
+        <text>设置</text>
+      </view>
+      <view class="menu-item" data-action="使用帮助" bindtap="onTapMenu">
+        <text>使用帮助</text>
+      </view>
+      <view class="menu-item" data-action="关于我们" bindtap="onTapMenu">
+        <text>关于我们</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <button class="btn-secondary logout-btn" bindtap="onTapLogout">退出登录</button>
+  </view>
+</view>

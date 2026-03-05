@@ -1,0 +1,46 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/notebook/notebook",
+    "pages/editor/editor",
+    "pages/ai/ai",
+    "pages/profile/profile",
+    "pages/noteDetail/noteDetail"
+  ],
+  "window": {
+    "backgroundColor": "#e8f0e7",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#5b8c5a",
+    "navigationBarTitleText": "电子笔记智能管理",
+    "navigationBarTextStyle": "white"
+  },
+  "tabBar": {
+    "color": "#8a8a8a",
+    "selectedColor": "#5b8c5a",
+    "borderStyle": "black",
+    "backgroundColor": "#ffffff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/notebook/notebook",
+        "text": "章回镜"
+      },
+      {
+        "pagePath": "pages/editor/editor",
+        "text": "卷云篇"
+      },
+      {
+        "pagePath": "pages/ai/ai",
+        "text": "神仙助"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json"
+}

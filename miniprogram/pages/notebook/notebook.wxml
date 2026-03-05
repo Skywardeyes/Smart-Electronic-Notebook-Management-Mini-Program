@@ -1,0 +1,85 @@
+<view class="page-container">
+  <view class="page-header">
+    <view>
+      <view class="page-title">章回镜</view>
+      <view class="page-subtitle">管理与检索你的全部笔记</view>
+    </view>
+    <button class="btn-primary btn-small" bindtap="onTapNew">新建</button>
+  </view>
+
+  <view class="section">
+    <view class="card flex-between">
+      <view class="flex-row search-box">
+        <text class="search-icon">🔍</text>
+        <input class="search-input"
+               placeholder="搜索标题、内容或标签"
+               value="{{searchText}}"
+               bindinput="onSearchInput" />
+      </view>
+      <view class="recycle-entry" bindtap="onTapRecycle">
+        回收站 · {{recycleCount}}
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <scroll-view class="category-scroll" scroll-x>
+      <view class="category-pill {{activeCategoryId==='all' ? 'category-pill-active' : ''}}"
+            data-id="all"
+            bindtap="onCategoryTap">
+        全部
+      </view>
+      <view wx:for="{{categories}}"
+            wx:key="{{item.id}}"
+            wx:if="{{item.id !== 'all'}}"
+            class="category-pill {{activeCategoryId===item.id ? 'category-pill-active' : ''}}"
+            data-id="{{item.id}}"
+            bindtap="onCategoryTap">
+        {{item.icon}} {{item.name}}
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="section">
+    <block wx:if="{{filteredNotes.length}}">
+      <view wx:for="{{filteredNotes}}"
+            wx:key="id"
+            wx:for-item="note"
+            wx:for-index="idx"
+            class="note-card">
+        <view class="note-card-main"
+              data-index="{{idx}}"
+              hover-class="note-card-main-hover"
+              bindtap="onTapNote">
+          <view class="flex-between">
+            <view class="note-title-row">
+              <text class="note-type-icon">📄</text>
+              <text class="note-title">{{note.title || '未命名笔记'}}</text>
+            </view>
+            <text class="note-meta">{{note.dateText}}</text>
+          </view>
+          <view class="note-meta">
+            {{note.category || '默认'}} · {{note.tagCount}} 标签
+          </view>
+          <view class="note-snippet">
+            {{note.content || '暂无内容'}}
+          </view>
+        </view>
+        <button class="note-card-menu"
+                data-index="{{idx}}"
+                hover-class="note-card-menu-hover"
+                bindtap="onTapDelete">
+          <text class="menu-dots">⋮</text>
+        </button>
+      </view>
+    </block>
+    <block wx:else>
+      <view class="card ajc empty-state">
+        <view>
+          <view class="empty-title">还没有符合条件的笔记</view>
+          <view class="empty-desc">可以新建一条，或调整搜索/分类条件。</view>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

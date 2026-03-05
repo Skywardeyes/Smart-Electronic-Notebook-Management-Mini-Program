@@ -1,0 +1,34 @@
+/* pages/noteDetail/noteDetail.wxss */
+
+.meta-row {
+  margin-top: 8rpx;
+  font-size: 26rpx;
+}
+
+.tag-list {
+  display: inline-flex;
+  flex-wrap: wrap;
+  margin-left: 8rpx;
+}
+
+.tag {
+  padding: 4rpx 12rpx;
+  margin-right: 8rpx;
+  border-radius: 999rpx;
+  background-color: #e8f0e7;
+  color: #5b8c5a;
+  font-size: 22rpx;
+}
+
+.ai-summary {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  color: #333333;
+}
+
+.note-content {
+  margin-top: 12rpx;
+  font-size: 26rpx;
+  color: #333333;
+  white-space: pre-wrap;
+}

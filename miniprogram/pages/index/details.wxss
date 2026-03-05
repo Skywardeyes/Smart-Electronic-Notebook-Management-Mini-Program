@@ -1,0 +1,10 @@
+.note-content {
+  font-size: 28rpx;
+  color: #374151;
+}
+
+.note-content image {
+  max-width: 100%;
+  border-radius: 12rpx;
+  margin: 12rpx 0;
+}

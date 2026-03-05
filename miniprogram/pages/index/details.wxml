@@ -1,0 +1,27 @@
+<view class="page">
+  <view class="page-header">
+    <view>
+      <view class="page-title">{{title || '未命名笔记'}}</view>
+      <view class="page-subtitle text-muted">
+        来自云端 · 可继续编辑
+      </view>
+    </view>
+    <button class="btn-secondary btn-small" bindtap="editnotes">编辑</button>
+  </view>
+
+  <view class="section">
+    <view class="card">
+      <view class="section-title">摘要</view>
+      <view class="note-snippet">
+        {{content || '这条笔记还没有摘要。'}}
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card">
+      <view class="section-title">正文</view>
+      <rich-text class="note-content" nodes="{{html}}"></rich-text>
+    </view>
+  </view>
+</view>

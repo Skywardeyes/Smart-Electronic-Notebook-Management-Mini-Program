@@ -1,0 +1,62 @@
+<view class="page-container" wx:if="{{note}}">
+  <view class="page-header">
+    <view>
+      <view class="page-title">笔记详情</view>
+      <view class="page-subtitle">{{note.title || '未命名笔记'}}</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card">
+      <view class="section-title">基本信息</view>
+      <view class="meta-row">
+        <text>创建时间：{{createTimeText}}</text>
+      </view>
+      <view class="meta-row">
+        <text>更新时间：{{updateTimeText}}</text>
+      </view>
+      <view class="meta-row">
+        <text>分类：{{note.category || '默认'}}</text>
+      </view>
+      <view class="meta-row">
+        <text>标签：</text>
+        <view class="tag-list">
+          <text class="tag" wx:for="{{note.tags}}" wx:key="{{item}}">{{item}}</text>
+          <text wx:if="{{!note.tags || !note.tags.length}}" class="text-muted">暂无标签</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card">
+      <view class="section-title flex-between">
+        <text>AI 摘要</text>
+        <view class="btn-group">
+          <button class="btn-secondary btn-small" loading="{{aiLoading}}" bindtap="onRegenerateSummary">重新生成</button>
+          <button class="btn-secondary btn-small" bindtap="onCopySummary">复制</button>
+        </view>
+      </view>
+      <view class="ai-summary">
+        {{aiSummary || note.summary || '暂未生成摘要，点击「重新生成」试试'}}
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card">
+      <view class="section-title">正文内容</view>
+      <view class="note-content">
+        {{note.content || '暂无内容'}}
+      </view>
+    </view>
+  </view>
+
+  <view class="fixed-footer">
+    <view class="btn-group">
+      <button class="btn-secondary" bindtap="onEdit">编辑</button>
+      <button class="btn-secondary" bindtap="onAskAI">仙人助问答</button>
+      <button class="btn-primary" bindtap="onDelete">删除</button>
+    </view>
+  </view>
+</view>

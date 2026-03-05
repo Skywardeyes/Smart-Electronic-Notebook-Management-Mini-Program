@@ -1,0 +1,114 @@
+/* pages/notebook/notebook.wxss */
+
+.search-box {
+  flex: 1;
+  padding: 12rpx 20rpx;
+  border-radius: 999rpx;
+  background-color: #f5f5f5;
+}
+
+.search-icon {
+  margin-right: 12rpx;
+  font-size: 26rpx;
+}
+
+.search-input {
+  flex: 1;
+  font-size: 26rpx;
+}
+
+.recycle-entry {
+  margin-left: 16rpx;
+  font-size: 24rpx;
+  color: #5b8c5a;
+}
+
+.category-scroll {
+  white-space: nowrap;
+}
+
+.category-pill {
+  display: inline-block;
+  padding: 10rpx 22rpx;
+  margin-right: 12rpx;
+  border-radius: 999rpx;
+  background-color: #f0f0f0;
+  font-size: 24rpx;
+  color: #666666;
+}
+
+.category-pill-active {
+  background-color: #5b8c5a;
+  color: #ffffff;
+}
+
+.note-card {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+}
+
+.note-card-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 80rpx;
+}
+
+.note-card-main-hover {
+  background-color: rgba(91, 140, 90, 0.08);
+}
+
+.note-card-menu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72rpx;
+  min-width: 72rpx;
+  flex-shrink: 0;
+  min-height: 80rpx;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+}
+
+.note-card-menu::after {
+  border: none;
+}
+
+.note-card-menu-hover {
+  background-color: rgba(91, 140, 90, 0.12);
+}
+
+.menu-dots {
+  font-size: 40rpx;
+  color: #999999;
+  line-height: 1;
+  letter-spacing: 2rpx;
+}
+
+.note-title-row {
+  display: flex;
+  align-items: center;
+}
+
+.note-type-icon {
+  margin-right: 8rpx;
+}
+
+.empty-state {
+  margin-top: 40rpx;
+}
+
+.empty-title {
+  text-align: center;
+  font-size: 30rpx;
+  margin-bottom: 8rpx;
+}
+
+.empty-desc {
+  text-align: center;
+  font-size: 26rpx;
+  color: #999999;
+}

@@ -1,0 +1,52 @@
+/* pages/editor/editor.wxss */
+
+.editor-card {
+  padding-bottom: 140rpx;
+}
+
+.editor-textarea {
+  width: 100%;
+  min-height: 400rpx;
+  max-height: 900rpx;
+  padding: 20rpx 24rpx;
+  box-sizing: border-box;
+  border-radius: 12rpx;
+  border: 1px solid #eeeeee;
+  background-color: #ffffff;
+  font-size: 28rpx;
+}
+
+.tag-row {
+  margin-top: 16rpx;
+}
+
+.tag-scroll {
+  white-space: nowrap;
+  padding-bottom: 8rpx;
+}
+
+.tag {
+  display: inline-block;
+  padding: 8rpx 20rpx;
+  margin-right: 12rpx;
+  border-radius: 999rpx;
+  background-color: #e8f0e7;
+  color: #5b8c5a;
+  font-size: 24rpx;
+}
+
+.tag-input-row {
+  margin-top: 12rpx;
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.tag-input {
+  flex: 1;
+  padding: 16rpx 20rpx;
+  border-radius: 12rpx;
+  border: 1px solid #eeeeee;
+  background-color: #ffffff;
+  font-size: 26rpx;
+}

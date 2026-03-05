@@ -1,0 +1,59 @@
+<view class="page-container">
+  <view class="page-header">
+    <view>
+      <view class="page-title">卷云篇</view>
+      <view class="page-subtitle">
+        {{mode === 'edit' ? '编辑笔记' : '新建笔记'}} · 自动草稿保存
+      </view>
+    </view>
+    <view class="btn-group">
+      <button class="btn-secondary btn-small" bindtap="onAIGenerateTitle">AI 标题</button>
+      <button class="btn-primary btn-small" bindtap="onTapSave">保存</button>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card">
+      <input class="input-modern"
+             placeholder="输入标题..."
+             value="{{title}}"
+             bindinput="onTitleInput" />
+      <view class="tag-row">
+        <scroll-view scroll-x class="tag-scroll">
+          <view class="tag" wx:for="{{tags}}" wx:key="{{item}}" data-tag="{{item}}" bindtap="removeTag">
+            {{item}} ✕
+          </view>
+        </scroll-view>
+        <view class="tag-input-row">
+          <input class="tag-input"
+                 placeholder="添加标签"
+                 value="{{newTagInput}}"
+                 bindinput="onNewTagInput"
+                 confirm-type="done"
+                 bindconfirm="addTag" />
+          <button class="btn-secondary btn-small" bindtap="addTag">添加</button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card editor-card">
+      <view class="section-title">正文内容</view>
+      <textarea class="editor-textarea"
+                placeholder="在这里记录内容，支持 Markdown 风格输入，例如：# 一级标题、- 列表项 等。"
+                value="{{content}}"
+                bindinput="onContentInput"
+                fixed="true"
+                show-confirm-bar="false"
+                auto-height="true" />
+    </view>
+  </view>
+
+  <view class="fixed-footer">
+    <view class="btn-group">
+      <button class="btn-secondary" loading="{{aiLoading}}" bindtap="onAIGenerateSummary">生成摘要</button>
+      <button class="btn-secondary" loading="{{aiLoading}}" bindtap="onAIExtractTags">提取标签</button>
+    </view>
+  </view>
+</view>
