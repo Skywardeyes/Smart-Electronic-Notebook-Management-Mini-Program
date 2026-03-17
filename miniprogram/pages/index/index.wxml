@@ -1,37 +1,63 @@
-<view class="page">
-  <view class="page-header">
-    <view>
-      <view class="page-title">云笔记</view>
-      <view class="page-subtitle">轻量、优雅的云端笔记本</view>
+<view class="home-page">
+  <!-- 顶部导航栏 -->
+  <view class="top-bar">
+    <view class="top-left">
+      <view class="avatar" bindtap="goProfile">Y</view>
+      <view class="user-info">
+        <view class="user-id-label">云友 ID</view>
+        <view class="user-id">#A93F</view>
+      </view>
+      <view class="top-icons-left">
+        <icon type="search" size="20" class="icon-btn"></icon>
+        <icon type="info" size="20" class="icon-btn"></icon>
+      </view>
+    </view>
+    <view class="top-right">
+      <view class="app-title">智能云笔记</view>
+      <view class="top-actions">
+        <icon type="more" size="20" class="icon-btn"></icon>
+        <view class="miniapp-btn"></view>
+      </view>
     </view>
   </view>
 
-  <view class="section">
-    <view class="card hero-card">
-      <view class="hero-title">随时随地记录灵感</view>
-      <view class="hero-desc">支持富文本编辑、图片插入和云端同步。</view>
-      <view class="btn-group hero-actions">
-        <button class="btn-primary" bindtap="goEditor">新建笔记</button>
-        <button class="btn-secondary" bindtap="getNoteData">查看全部</button>
-      </view>
+  <!-- 标签栏 -->
+  <view class="tabs">
+    <view
+      class="tab-item {{currentTab === 'latest' ? 'active' : ''}}"
+      data-tab="latest"
+      bindtap="onTabChange"
+    >
+      最新
+    </view>
+    <view
+      class="tab-item {{currentTab === 'star' ? 'active' : ''}}"
+      data-tab="star"
+      bindtap="onTabChange"
+    >
+      收藏
+    </view>
+    <view
+      class="tab-item {{currentTab === 'wechat' ? 'active' : ''}}"
+      data-tab="wechat"
+      bindtap="onTabChange"
+    >
+      微信文件
     </view>
   </view>
 
-  <view class="section quick-actions">
-    <view class="section-title">快速操作</view>
-    <view class="quick-grid">
-      <view class="quick-item" bindtap="goEditor">
-        <view class="quick-icon quick-icon-primary">+</view>
-        <view class="quick-text">空白笔记</view>
+  <!-- 笔记列表 -->
+  <view class="note-list">
+    <block wx:for="{{notes}}" wx:key="id">
+      <view class="note-item">
+        <view class="note-icon">
+          <text class="note-icon-text">文</text>
+        </view>
+        <view class="note-content">
+          <view class="note-title">{{item.title}}</view>
+          <view class="note-time">{{item.time}}</view>
+        </view>
       </view>
-      <view class="quick-item" bindtap="getNoteData">
-        <view class="quick-icon">☰</view>
-        <view class="quick-text">云端笔记</view>
-      </view>
-      <view class="quick-item" bindtap="goRichEditor">
-        <view class="quick-icon">Aa</view>
-        <view class="quick-text">富文本示例</view>
-      </view>
-    </view>
+    </block>
   </view>
 </view>

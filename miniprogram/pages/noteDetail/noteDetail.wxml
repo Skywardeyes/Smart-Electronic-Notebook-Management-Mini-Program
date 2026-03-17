@@ -55,7 +55,7 @@
   <view class="fixed-footer">
     <view class="btn-group">
       <button class="btn-secondary" bindtap="onEdit">编辑</button>
-      <button class="btn-secondary" bindtap="onAskAI">仙人助问答</button>
+      <button class="btn-secondary" bindtap="onAskAI">神仙助问答</button>
       <button class="btn-primary" bindtap="onDelete">删除</button>
     </view>
   </view>

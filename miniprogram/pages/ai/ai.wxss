@@ -20,7 +20,7 @@
 }
 
 .mode-pill-active {
-  background-color: #5b8c5a;
+  background: linear-gradient(135deg, #a855f7, #6366f1);
   color: #ffffff;
 }
 
@@ -42,8 +42,8 @@
 }
 
 .context-pill-active {
-  background-color: #e8f0e7;
-  color: #5b8c5a;
+  background-color: #f3e8ff;
+  color: #7c3aed;
 }
 
 .qa-scroll {
@@ -60,7 +60,7 @@
 
 .qa-user {
   align-self: flex-start;
-  background-color: #e8f0e7;
+  background-color: #f3e8ff;
 }
 
 .qa-ai {

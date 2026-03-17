@@ -20,7 +20,7 @@
 .recycle-entry {
   margin-left: 16rpx;
   font-size: 24rpx;
-  color: #5b8c5a;
+  color: #4f46e5;
 }
 
 .category-scroll {
@@ -38,7 +38,7 @@
 }
 
 .category-pill-active {
-  background-color: #5b8c5a;
+  background: linear-gradient(135deg, #a855f7, #6366f1);
   color: #ffffff;
 }
 
@@ -55,7 +55,7 @@
 }
 
 .note-card-main-hover {
-  background-color: rgba(91, 140, 90, 0.08);
+  background-color: rgba(129, 140, 248, 0.08);
 }
 
 .note-card-menu {
@@ -78,7 +78,7 @@
 }
 
 .note-card-menu-hover {
-  background-color: rgba(91, 140, 90, 0.12);
+  background-color: rgba(129, 140, 248, 0.12);
 }
 
 .menu-dots {

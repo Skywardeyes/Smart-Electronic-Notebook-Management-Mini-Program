@@ -1,5 +1,5 @@
 page {
-  background-color: #f5f5f5;
+  background-color: #ffffff;
   color: #333333;
   font-size: 28rpx;
   line-height: 1.6;
@@ -9,7 +9,7 @@ page {
   min-height: 100vh;
   box-sizing: border-box;
   padding: 20rpx;
-  background-color: #f5f5f5;
+  background-color: #ffffff;
 }
 
 .page-header {
@@ -63,7 +63,7 @@ page {
 }
 
 .btn-primary {
-  background-color: #5b8c5a;
+  background: linear-gradient(135deg, #8b5cf6, #3b82f6);
   color: #ffffff;
   border: none;
 }
@@ -74,8 +74,8 @@ page {
 
 .btn-secondary {
   background-color: #ffffff;
-  color: #5b8c5a;
-  border: 1px solid #5b8c5a;
+  color: #4f46e5;
+  border: 1px solid #a855f7;
 }
 
 .btn-secondary::after {

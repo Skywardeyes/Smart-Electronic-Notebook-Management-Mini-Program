@@ -15,8 +15,8 @@
   padding: 4rpx 12rpx;
   margin-right: 8rpx;
   border-radius: 999rpx;
-  background-color: #e8f0e7;
-  color: #5b8c5a;
+  background-color: #f3e8ff;
+  color: #7c3aed;
   font-size: 22rpx;
 }
 
