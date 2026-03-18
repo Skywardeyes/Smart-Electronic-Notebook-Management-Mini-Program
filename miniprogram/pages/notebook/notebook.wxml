@@ -1,7 +1,7 @@
 <view class="page-container">
   <view class="page-header">
     <view>
-      <view class="page-title">章回镜</view>
+      <view class="page-title">笔记总览</view>
       <view class="page-subtitle">管理与检索你的全部笔记</view>
     </view>
     <button class="btn-primary btn-small" bindtap="onTapNew">新建</button>

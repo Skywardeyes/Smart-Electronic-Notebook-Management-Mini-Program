@@ -1,7 +1,7 @@
 <view class="page-container">
   <view class="page-header">
     <view>
-      <view class="page-title">卷云篇</view>
+      <view class="page-title">笔记编辑</view>
       <view class="page-subtitle">
         {{mode === 'edit' ? '编辑笔记' : '新建笔记'}} · 自动草稿保存
       </view>

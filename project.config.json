@@ -45,7 +45,7 @@
     "swc": false,
     "disableSWC": true
   },
-  "appid": "请填入你的appid",
+  "appid": "wx7ddbd0d3f99bbdd2",
   "projectname": "my-couldnotes",
   "libVersion": "2.14.1",
   "cloudfunctionTemplateRoot": "cloudfunctionTemplate/",
