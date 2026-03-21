@@ -1,5 +1,5 @@
 <view class="home-page">
-  <!-- 顶部导航栏 -->
+  <!-- 顶部：头像、云友 ID、产品名（保留） -->
   <view class="top-bar">
     <view class="top-left">
       <view class="avatar" bindtap="goProfile">Y</view>
@@ -21,41 +21,78 @@
     </view>
   </view>
 
-  <!-- 标签栏 -->
-  <view class="tabs">
-    <view
-      class="tab-item {{currentTab === 'latest' ? 'active' : ''}}"
-      data-tab="latest"
-      bindtap="onTabChange"
-    >
-      最新
-    </view>
-    <view
-      class="tab-item {{currentTab === 'star' ? 'active' : ''}}"
-      data-tab="star"
-      bindtap="onTabChange"
-    >
-      收藏
-    </view>
-    <view
-      class="tab-item {{currentTab === 'wechat' ? 'active' : ''}}"
-      data-tab="wechat"
-      bindtap="onTabChange"
-    >
-      微信文件
+  <!-- 原文件夹页：搜索、新建、分类、列表（无「笔记总览」标题） -->
+  <view class="section">
+    <view class="card">
+      <view class="flex-row search-box">
+        <text class="search-icon">🔍</text>
+        <input class="search-input"
+               placeholder="搜索标题、内容或标签"
+               value="{{searchText}}"
+               bindinput="onSearchInput" />
+      </view>
+      <view class="home-actions-row">
+        <button class="btn-primary btn-small" bindtap="onTapNew">新建</button>
+      </view>
     </view>
   </view>
 
-  <!-- 笔记列表 -->
-  <view class="note-list">
-    <block wx:for="{{notes}}" wx:key="id">
-      <view class="note-item">
-        <view class="note-icon">
-          <text class="note-icon-text">文</text>
+  <view class="section">
+    <scroll-view class="category-scroll" scroll-x>
+      <view class="category-pill {{activeCategoryId==='all' ? 'category-pill-active' : ''}}"
+            data-id="all"
+            bindtap="onCategoryTap">
+        全部
+      </view>
+      <view wx:for="{{categories}}"
+            wx:key="{{item.id}}"
+            wx:if="{{item.id !== 'all'}}"
+            class="category-pill {{activeCategoryId===item.id ? 'category-pill-active' : ''}}"
+            data-id="{{item.id}}"
+            bindtap="onCategoryTap">
+        {{item.icon}} {{item.name}}
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="section section-notes">
+    <block wx:if="{{filteredNotes.length}}">
+      <view wx:for="{{filteredNotes}}"
+            wx:key="id"
+            wx:for-item="note"
+            wx:for-index="idx"
+            class="note-card">
+        <view class="note-card-main"
+              data-note-id="{{note.id || note._id}}"
+              hover-class="note-card-main-hover"
+              bindtap="onTapNote">
+          <view class="flex-between">
+            <view class="note-title-row">
+              <text class="note-type-icon">📄</text>
+              <text class="note-title">{{note.title || '未命名笔记'}}</text>
+            </view>
+            <text class="note-meta">{{note.dateText}}</text>
+          </view>
+          <view class="note-meta">
+            {{note.category || '默认'}} · {{note.tagCount}} 标签
+          </view>
+          <view class="note-snippet">
+            {{note.content || '暂无内容'}}
+          </view>
         </view>
-        <view class="note-content">
-          <view class="note-title">{{item.title}}</view>
-          <view class="note-time">{{item.time}}</view>
+        <view class="note-card-menu"
+              data-note-id="{{note.id || note._id}}"
+              hover-class="note-card-menu-hover"
+              catchtap="onTapDelete">
+          <view class="menu-dots">⋮</view>
+        </view>
+      </view>
+    </block>
+    <block wx:else>
+      <view class="card ajc empty-state">
+        <view>
+          <view class="empty-title">还没有符合条件的笔记</view>
+          <view class="empty-desc">可以新建一条，或调整搜索/分类条件。</view>
         </view>
       </view>
     </block>

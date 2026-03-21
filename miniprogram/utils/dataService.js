@@ -143,6 +143,17 @@ function hardDeleteNote(id) {
   saveArray(STORAGE_KEYS.NOTES, notes)
 }
 
+/** 仅回收站中的笔记 */
+function getDeletedNotes() {
+  return getNotes(true).filter(n => n.status === 'deleted')
+}
+
+/** 永久删除所有已在回收站的笔记 */
+function purgeAllDeletedNotes() {
+  const notes = getNotes(true).filter(n => n.status !== 'deleted')
+  saveArray(STORAGE_KEYS.NOTES, notes)
+}
+
 function getRecentNotes(limit = 5) {
   return getNotes(false)
     .slice()
@@ -188,6 +199,8 @@ module.exports = {
   softDeleteNote,
   restoreNote,
   hardDeleteNote,
+  getDeletedNotes,
+  purgeAllDeletedNotes,
   getRecentNotes,
   getCategories,
   saveCategories,

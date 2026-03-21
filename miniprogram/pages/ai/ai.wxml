@@ -2,17 +2,14 @@
   <view class="page-header">
     <view>
       <view class="page-title">AI 智能助手</view>
-      <view class="page-subtitle">问答、摘要与润色，一站式 AI 小助手</view>
+      <view class="page-subtitle">问答与扩写；摘要请在笔记编辑页生成</view>
     </view>
   </view>
 
   <view class="section">
-    <view class="card mode-tabs">
+    <view class="card mode-tabs mode-tabs-two">
       <view class="mode-pill {{mode==='qa' ? 'mode-pill-active' : ''}}" data-mode="qa" bindtap="switchMode">
         问答模式
-      </view>
-      <view class="mode-pill {{mode==='summary' ? 'mode-pill-active' : ''}}" data-mode="summary" bindtap="switchMode">
-        摘要模式
       </view>
       <view class="mode-pill {{mode==='polish' ? 'mode-pill-active' : ''}}" data-mode="polish" bindtap="switchMode">
         扩写模式
@@ -21,15 +18,21 @@
   </view>
 
   <view class="section" wx:if="{{mode==='qa'}}">
-    <view class="card context-row">
+    <view class="card quick-ask-row">
+      <view class="quick-ask" data-text="帮我总结这段内容的要点" bindtap="onQuickAsk">帮我总结</view>
+      <view class="quick-ask" data-text="提取这段内容的关键词" bindtap="onQuickAsk">提取关键词</view>
+      <view class="quick-ask" data-text="请用更通俗的方式解释这段话" bindtap="onQuickAsk">解释概念</view>
+      <view class="quick-ask" data-text="请用更正式的书面语润色这段话" bindtap="onQuickAsk">润色文字</view>
+    </view>
+  </view>
+
+  <view class="section" wx:if="{{mode==='qa' && contextType !== 'history'}}">
+    <view class="card context-row context-row-two">
       <view class="context-pill {{contextType==='none' ? 'context-pill-active' : ''}}" data-type="none" bindtap="switchContext">
-        新对话
+        当前对话
       </view>
-      <view class="context-pill {{contextType==='all' ? 'context-pill-active' : ''}}" data-type="all" bindtap="switchContext">
-        全部笔记
-      </view>
-      <view class="context-pill {{contextType==='note' ? 'context-pill-active' : ''}}" data-type="note" bindtap="switchContext">
-        当前笔记
+      <view class="context-pill {{contextType==='history' ? 'context-pill-active' : ''}}" data-type="history" bindtap="switchContext">
+        历史对话
       </view>
     </view>
 
@@ -45,39 +48,59 @@
     </view>
   </view>
 
-  <view class="section" wx:if="{{mode!=='qa'}}">
+  <view class="section" wx:if="{{mode==='qa' && contextType === 'history'}}">
     <view class="card">
-      <view class="section-title">
-        {{mode==='summary' ? '原文内容' : '需要润色的文本'}}
-      </view>
+      <view class="section-title">历史对话</view>
+      <view class="hint-muted history-hint">点击一条记录可继续在该会话中提问；从笔记选区/全文进入将自动新开会话并回到「当前对话」。</view>
+      <scroll-view class="history-scroll" scroll-y>
+        <view wx:for="{{savedSessions}}"
+              wx:key="id"
+              class="history-item">
+          <view class="history-item-main" data-id="{{item.id}}" bindtap="onOpenSession">
+            <view class="history-item-icon">
+              <text class="history-item-icon-text">📄</text>
+            </view>
+            <view class="history-item-body">
+              <text class="history-item-preview">{{item.preview || '（无预览）'}}</text>
+              <text class="history-item-meta">{{item.dateText}}</text>
+            </view>
+          </view>
+          <text class="history-item-trash"
+                data-id="{{item.id}}"
+                catchtap="onDeleteHistorySession">删除</text>
+        </view>
+        <view wx:if="{{!savedSessions.length}}" class="history-empty">暂无历史记录，发起对话后会自动保存</view>
+      </scroll-view>
+    </view>
+  </view>
+
+  <view class="section" wx:if="{{mode==='polish'}}">
+    <view class="card">
+      <view class="section-title">需要润色的文本</view>
       <textarea class="ai-textarea"
-                placeholder="{{mode==='summary' ? '粘贴或输入需要摘要的内容' : '输入需要润色或扩写的内容'}}"
+                placeholder="输入需要润色或扩写的内容"
                 value="{{inputText}}"
                 bindinput="onInput"
                 auto-height="true" />
     </view>
     <view class="card" wx:if="{{resultText}}">
-      <view class="section-title">
-        {{mode==='summary' ? '摘要结果' : '润色结果'}}
-      </view>
+      <view class="section-title">润色结果</view>
       <view class="result-text">{{resultText}}</view>
       <button class="btn-secondary btn-small" bindtap="onCopyResult">复制结果</button>
     </view>
   </view>
 
-  <view class="section">
-    <view class="card quick-ask-row">
-      <view class="quick-ask" data-text="帮我总结这段内容的要点" bindtap="onQuickAsk">帮我总结</view>
-      <view class="quick-ask" data-text="提取这段内容的关键词" bindtap="onQuickAsk">提取关键词</view>
-      <view class="quick-ask" data-text="请用更通俗的方式解释这段话" bindtap="onQuickAsk">解释概念</view>
-      <view class="quick-ask" data-text="请用更正式的书面语润色这段话" bindtap="onQuickAsk">润色文字</view>
-    </view>
-  </view>
-
   <view class="fixed-footer">
+    <view class="attach-tag-bar" wx:if="{{mode==='qa' && contextType !== 'history' && attachTag}}">
+      <view class="attach-tag-chip">
+        <text class="attach-tag-text">{{attachTag.label}}</text>
+        <text class="attach-tag-close" bindtap="onRemoveAttach">✕</text>
+      </view>
+      <text class="attach-tag-hint">发送时将自动附带该上下文与系统提示词</text>
+    </view>
     <view class="ai-input-row">
       <textarea class="ai-input"
-                placeholder="{{mode==='qa' ? '向 AI 提问...' : '输入或粘贴内容...'}}"
+                placeholder="{{mode==='qa' && attachTag ? '输入您的问题…' : (mode==='qa' ? '向 AI 提问...' : '输入或粘贴内容...')}}"
                 value="{{inputText}}"
                 bindinput="onInput"
                 auto-height="true" />

@@ -15,7 +15,7 @@
   font-size: 26rpx;
 }
 
-.mode-pill:last-child {
+.mode-tabs-two .mode-pill:last-child {
   margin-right: 0;
 }
 
@@ -44,6 +44,88 @@
 .context-pill-active {
   background-color: #f3e8ff;
   color: #7c3aed;
+}
+
+.context-row-two .context-pill + .context-pill {
+  margin-left: 16rpx;
+}
+
+.history-hint {
+  font-size: 22rpx;
+  color: #999999;
+  line-height: 1.45;
+  margin-bottom: 16rpx;
+}
+
+.history-scroll {
+  max-height: 520rpx;
+}
+
+.history-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f0f0;
+}
+
+.history-item:last-child {
+  border-bottom: none;
+}
+
+.history-item-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.history-item-trash {
+  flex-shrink: 0;
+  font-size: 24rpx;
+  color: #94a3b8;
+  padding: 12rpx 4rpx 12rpx 20rpx;
+}
+
+.history-item-icon {
+  width: 52rpx;
+  flex-shrink: 0;
+  padding-top: 4rpx;
+}
+
+.history-item-icon-text {
+  font-size: 30rpx;
+}
+
+.history-item-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-item-preview {
+  font-size: 26rpx;
+  color: #333333;
+  line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.history-item-meta {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 22rpx;
+  color: #9ca3af;
+}
+
+.history-empty {
+  padding: 48rpx 16rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #9ca3af;
 }
 
 .qa-scroll {
@@ -94,6 +176,49 @@
   border-radius: 999rpx;
   background-color: #f0f0f0;
   font-size: 24rpx;
+}
+
+.attach-tag-bar {
+  width: 100%;
+  padding-bottom: 12rpx;
+  border-bottom: 1px solid #f0f0f0;
+  margin-bottom: 12rpx;
+}
+
+.attach-tag-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 8rpx 16rpx 8rpx 20rpx;
+  border-radius: 999rpx;
+  background: linear-gradient(135deg, #ede9fe, #e0e7ff);
+  border: 1px solid #c4b5fd;
+}
+
+.attach-tag-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 24rpx;
+  color: #5b21b6;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 12rpx;
+}
+
+.attach-tag-close {
+  flex-shrink: 0;
+  font-size: 28rpx;
+  color: #7c3aed;
+  padding: 4rpx 8rpx;
+}
+
+.attach-tag-hint {
+  display: block;
+  margin-top: 8rpx;
+  font-size: 20rpx;
+  color: #999999;
+  line-height: 1.4;
 }
 
 .ai-input-row {

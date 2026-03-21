@@ -15,3 +15,10 @@ node_modules/
 miniprogram/app.js
 project.config.json
 project.private.config.json
+
+# Secrets / local config
+.env
+.env.*
+!.env.example
+anythingllm-info.txt
+anythingllm-test.local.py

@@ -1,6 +1,11 @@
 const dataService = require('../../utils/dataService.js')
 
 Page({
+  onLoad() {
+    // 个人信息已合并到 Tab「我的」(pages/notebook)，保留本页仅作旧链接跳转
+    wx.switchTab({ url: '/pages/notebook/notebook' })
+  },
+
   data: {
     userInfo: null,
     stats: {

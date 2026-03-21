@@ -1,0 +1,14 @@
+<view class="create-page">
+  <view class="plus-wrapper" bindtap="toggleExpand">
+    <view class="plus-circle">
+      <text class="plus-text">＋</text>
+    </view>
+    <view class="plus-label">创建</view>
+  </view>
+
+  <view wx:if="{{expanded}}" class="actions">
+    <button class="action-btn primary" bindtap="goEditor">新建笔记</button>
+    <button class="action-btn secondary" bindtap="goAI">AI 问答</button>
+  </view>
+</view>
+

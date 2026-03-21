@@ -1,6 +1,7 @@
 {
   "pages": [
     "pages/index/index",
+    "pages/create/create",
     "pages/notebook/notebook",
     "pages/editor/editor",
     "pages/ai/ai",
@@ -15,6 +16,7 @@
     "navigationBarTextStyle": "black"
   },
   "tabBar": {
+    "custom": true,
     "color": "#8a8a8a",
     "selectedColor": "#6c5ce7",
     "borderStyle": "black",
@@ -25,12 +27,12 @@
         "text": "首页"
       },
       {
-        "pagePath": "pages/editor/editor",
-        "text": "新建"
+        "pagePath": "pages/create/create",
+        "text": "+"
       },
       {
         "pagePath": "pages/notebook/notebook",
-        "text": "文件夹"
+        "text": "我的"
       }
     ]
   },

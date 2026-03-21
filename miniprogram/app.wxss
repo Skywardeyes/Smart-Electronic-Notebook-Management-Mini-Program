@@ -62,6 +62,34 @@ page {
   justify-content: space-between;
 }
 
+/* 笔记选区 → AI 问答：标题行链接与说明 */
+.section-title.section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-bottom: 12rpx;
+}
+
+.ai-prefill-links {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+}
+
+.text-link {
+  font-size: 24rpx;
+  color: #7c3aed;
+}
+
+.hint-muted {
+  font-size: 22rpx;
+  color: #999999;
+  margin-bottom: 16rpx;
+  line-height: 1.45;
+}
+
 .btn-primary {
   background: linear-gradient(135deg, #8b5cf6, #3b82f6);
   color: #ffffff;

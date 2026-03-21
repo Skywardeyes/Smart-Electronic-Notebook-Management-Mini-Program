@@ -31,29 +31,53 @@
                  bindinput="onNewTagInput"
                  confirm-type="done"
                  bindconfirm="addTag" />
-          <button class="btn-secondary btn-small" bindtap="addTag">添加</button>
+          <button class="btn-secondary editor-tag-action-btn" bindtap="addTag">添加</button>
+          <button class="btn-secondary editor-tag-action-btn"
+                  loading="{{aiLoading}}"
+                  bindtap="onAIExtractTags">提取标签</button>
         </view>
       </view>
     </view>
   </view>
 
   <view class="section">
-    <view class="card editor-card">
-      <view class="section-title">正文内容</view>
+    <view class="card editor-card" bindlongpress="onBodyAreaLongPress">
+      <view class="section-title section-title-row">
+        <text>正文内容</text>
+        <view class="ai-prefill-links">
+          <text class="text-link" catchtap="onAskClipForAI">选区问AI</text>
+          <text class="text-link" catchtap="onAskFullBodyForAI">全文问AI</text>
+        </view>
+      </view>
+      <view class="hint-muted">拖选后系统「复制」，再点「选区问AI」：AI 页底部会显示「剪贴板内容」标签，输入框保持空白，输入问题后发送即可合并上下文。（系统菜单无法增加自定义项）</view>
       <textarea class="editor-textarea"
                 placeholder="在这里记录内容，支持 Markdown 风格输入，例如：# 一级标题、- 列表项 等。"
                 value="{{content}}"
                 bindinput="onContentInput"
+                maxlength="-1"
                 fixed="true"
                 show-confirm-bar="false"
                 auto-height="true" />
     </view>
   </view>
 
-  <view class="fixed-footer">
-    <view class="btn-group">
-      <button class="btn-secondary" loading="{{aiLoading}}" bindtap="onAIGenerateSummary">生成摘要</button>
-      <button class="btn-secondary" loading="{{aiLoading}}" bindtap="onAIExtractTags">提取标签</button>
+  <view class="section">
+    <view class="card summary-card">
+      <view class="section-title section-title-row summary-title-row">
+        <text>笔记摘要</text>
+        <button class="btn-secondary editor-summary-ai-btn"
+                loading="{{aiLoading}}"
+                bindtap="onAIGenerateSummary">生成摘要</button>
+      </view>
+      <view class="hint-muted summary-hint">可根据正文自动生成，也可在下方手动编辑。</view>
+      <textarea class="editor-summary-textarea"
+                placeholder="摘要将显示在这里…"
+                value="{{summary}}"
+                bindinput="onSummaryInput"
+                maxlength="-1"
+                fixed="true"
+                show-confirm-bar="false"
+                auto-height="true" />
     </view>
   </view>
 </view>

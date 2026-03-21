@@ -41,15 +41,6 @@
 
   <view class="section">
     <view class="card menu-card">
-      <view class="menu-item" data-action="分类管理" bindtap="onTapMenu">
-        <text>我的分类</text>
-      </view>
-      <view class="menu-item" data-action="标签管理" bindtap="onTapMenu">
-        <text>标签管理</text>
-      </view>
-      <view class="menu-item" data-action="回收站" bindtap="onTapMenu">
-        <text>回收站</text>
-      </view>
       <view class="menu-item" data-action="设置" bindtap="onTapMenu">
         <text>设置</text>
       </view>

@@ -1,5 +1,6 @@
 const dataService = require('../../utils/dataService.js')
 const aiService = require('../../utils/aiService.js')
+const aiPrefill = require('../../utils/aiPrefill.js')
 
 Page({
   data: {
@@ -56,14 +57,56 @@ Page({
   },
 
   onEdit() {
-    wx.switchTab({
-      url: '/pages/editor/editor'
+    const app = getApp()
+    app.globalData.editorNoteId = this.data.noteId
+    app.globalData.editorMode = 'edit'
+    wx.navigateTo({
+      url: `/pages/editor/editor?mode=edit&id=${encodeURIComponent(this.data.noteId || '')}`
     })
   },
 
   onAskAI() {
-    wx.switchTab({
+    wx.navigateTo({
       url: '/pages/ai/ai'
+    })
+  },
+
+  onAskClipForAI() {
+    wx.getClipboardData({
+      success: (res) => {
+        const t = (res.data || '').trim()
+        if (!t) {
+          wx.showToast({
+            title: '剪贴板为空，请先在正文里长按并复制选中文本',
+            icon: 'none'
+          })
+          return
+        }
+        aiPrefill.navigateWithClipboardAttach(t)
+      },
+      fail: () => {
+        wx.showToast({ title: '无法读取剪贴板', icon: 'none' })
+      }
+    })
+  },
+
+  onAskFullBodyForAI() {
+    const note = this.data.note
+    const t = (note && note.content ? String(note.content) : '').trim()
+    if (!t) {
+      wx.showToast({ title: '正文为空', icon: 'none' })
+      return
+    }
+    aiPrefill.navigateWithFullNoteFromDetail(this.data.noteId, note.title || '')
+  },
+
+  onBodyAreaLongPress() {
+    wx.showActionSheet({
+      itemList: ['用剪贴板选区问AI（需先复制）', '用当前全文问AI'],
+      success: (res) => {
+        if (res.tapIndex === 0) this.onAskClipForAI()
+        else if (res.tapIndex === 1) this.onAskFullBodyForAI()
+      }
     })
   },
 
@@ -72,11 +115,14 @@ Page({
     if (!id) return
     wx.showModal({
       title: '删除笔记',
-      content: '确定要彻底删除这条云端笔记吗？删除后不可恢复。',
-      success: res => {
+      content: '确定永久删除这条笔记？删除后不可恢复。',
+      confirmText: '删除',
+      cancelText: '取消',
+      confirmColor: '#dc2626',
+      success: (res) => {
         if (res.confirm) {
           dataService.hardDeleteNote(id)
-          wx.showToast({ title: '已删除', icon: 'none' })
+          wx.showToast({ title: '已删除', icon: 'success' })
           wx.navigateBack()
         }
       }

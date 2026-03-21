@@ -1,114 +1,68 @@
-/* pages/notebook/notebook.wxss */
+/* Tab「我的」：原 profile 页内容 */
 
-.search-box {
-  flex: 1;
-  padding: 12rpx 20rpx;
-  border-radius: 999rpx;
-  background-color: #f5f5f5;
-}
-
-.search-icon {
-  margin-right: 12rpx;
-  font-size: 26rpx;
-}
-
-.search-input {
-  flex: 1;
-  font-size: 26rpx;
-}
-
-.recycle-entry {
-  margin-left: 16rpx;
-  font-size: 24rpx;
-  color: #4f46e5;
-}
-
-.category-scroll {
-  white-space: nowrap;
-}
-
-.category-pill {
-  display: inline-block;
-  padding: 10rpx 22rpx;
-  margin-right: 12rpx;
-  border-radius: 999rpx;
-  background-color: #f0f0f0;
-  font-size: 24rpx;
-  color: #666666;
-}
-
-.category-pill-active {
-  background: linear-gradient(135deg, #a855f7, #6366f1);
-  color: #ffffff;
-}
-
-.note-card {
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-}
-
-.note-card-main {
-  flex: 1;
-  min-width: 0;
-  min-height: 80rpx;
-}
-
-.note-card-main-hover {
-  background-color: rgba(129, 140, 248, 0.08);
-}
-
-.note-card-menu {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 72rpx;
-  min-width: 72rpx;
-  flex-shrink: 0;
-  min-height: 80rpx;
-  margin: 0;
-  padding: 0;
-  background: transparent;
-  border: none;
-  border-radius: 0;
-}
-
-.note-card-menu::after {
-  border: none;
-}
-
-.note-card-menu-hover {
-  background-color: rgba(129, 140, 248, 0.12);
-}
-
-.menu-dots {
-  font-size: 40rpx;
-  color: #999999;
-  line-height: 1;
-  letter-spacing: 2rpx;
-}
-
-.note-title-row {
+.profile-tab-page .profile-header {
   display: flex;
   align-items: center;
 }
 
-.note-type-icon {
-  margin-right: 8rpx;
+.profile-avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  margin-right: 20rpx;
+  background-color: #f3f4f6;
 }
 
-.empty-state {
-  margin-top: 40rpx;
+.profile-info {
+  flex: 1;
 }
 
-.empty-title {
+.nickname {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin-bottom: 6rpx;
+}
+
+.wechat-id {
+  font-size: 24rpx;
+}
+
+.edit-btn {
+  margin-top: 10rpx;
+}
+
+.stats-card {
+  display: flex;
+  justify-content: space-between;
+}
+
+.stats-item {
+  flex: 1;
+  align-items: center;
   text-align: center;
+}
+
+.stats-number {
   font-size: 30rpx;
-  margin-bottom: 8rpx;
+  font-weight: 600;
 }
 
-.empty-desc {
-  text-align: center;
-  font-size: 26rpx;
+.stats-label {
+  font-size: 24rpx;
   color: #999999;
+  margin-top: 4rpx;
+}
+
+.menu-card .menu-item {
+  padding: 20rpx 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 28rpx;
+}
+
+.menu-card .menu-item:last-child {
+  border-bottom: none;
+}
+
+.logout-btn {
+  width: 100%;
 }

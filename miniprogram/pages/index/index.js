@@ -1,109 +1,133 @@
-Page({
+const dataService = require('../../utils/dataService.js')
 
-  /**
-   * 页面的初始数据
-   */
+Page({
   data: {
-    currentTab: 'latest',
-    notes: [
-      {
-        id: 1,
-        title: '在智能笔记构建你的学霸笔记吧！',
-        time: '今天 21:23'
-      },
-      {
-        id: 2,
-        title: '在云笔记打造你的技术知识库吧！',
-        time: '今天 20:06'
-      },
-      {
-        id: 3,
-        title: '在云笔记搭建你的高效工作流吧！',
-        time: '昨天 18:45'
-      }
-    ]
+    searchText: '',
+    activeCategoryId: 'all',
+    categories: [],
+    notes: [],
+    filteredNotes: []
   },
+
   goProfile() {
-    wx.navigateTo({
-      url: '/pages/profile/profile'
-    })
-  },
-  onTabChange(e) {
-    const tab = e.currentTarget.dataset.tab
-    this.setData({
-      currentTab: tab
-    })
-  },
-  getNoteData(){
     wx.switchTab({
       url: '/pages/notebook/notebook'
     })
   },
-  goEditor(){
-    wx.switchTab({
+
+  onShow() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({
+        selected: 0
+      })
+    }
+    this.loadData()
+  },
+
+  loadData() {
+    const categories = dataService.getCategories()
+    const notes = dataService.getNotes(true)
+    this.setData({
+      categories,
+      notes: notes.filter((n) => n.status !== 'deleted')
+    })
+    this.applyFilter()
+  },
+
+  onSearchInput(e) {
+    const value = e.detail.value || ''
+    this.setData({ searchText: value })
+    this.applyFilter({
+      searchText: value
+    })
+  },
+
+  onCategoryTap(e) {
+    const id = e.currentTarget.dataset.id
+    this.setData({ activeCategoryId: id })
+    this.applyFilter({
+      activeCategoryId: id
+    })
+  },
+
+  applyFilter(overrides = {}) {
+    const notes = overrides.notes || this.data.notes
+    const activeCategoryId = overrides.activeCategoryId || this.data.activeCategoryId
+    const searchText = overrides.searchText !== undefined ? overrides.searchText : this.data.searchText
+    const kw = String(searchText || '').trim().toLowerCase()
+    const list = notes
+      .filter((n) => {
+        if (
+          activeCategoryId !== 'all' &&
+          n.category !== activeCategoryId &&
+          n.category !== this.findCategoryName(activeCategoryId)
+        ) {
+          return false
+        }
+        if (!kw) return true
+        const text = `${n.title || ''} ${n.content || ''} ${(n.tags || []).join(' ')}`
+        return text.toLowerCase().includes(kw)
+      })
+      .map((n) => {
+        const dateStr = (n.updateTime || n.createTime || '').slice(0, 10)
+        return Object.assign({}, n, {
+          dateText: dateStr,
+          tagCount: (n.tags && n.tags.length) || 0
+        })
+      })
+    this.setData({ filteredNotes: list })
+  },
+
+  findCategoryName(id) {
+    const c = (this.data.categories || []).find((x) => x.id === id)
+    return c ? c.name : ''
+  },
+
+  resolveNoteIdFromEvent(e) {
+    let id = e.currentTarget.dataset.noteId
+    if (id === undefined || id === null || id === '') {
+      return ''
+    }
+    return String(id)
+  },
+
+  onTapNote(e) {
+    const id = this.resolveNoteIdFromEvent(e)
+    if (!id) {
+      wx.showToast({ title: '无法打开该笔记', icon: 'none' })
+      return
+    }
+    const app = getApp()
+    app.globalData.editorNoteId = id
+    app.globalData.editorMode = 'edit'
+    wx.navigateTo({
       url: '/pages/editor/editor'
     })
   },
-  goRichEditor(){
-    wx.switchTab({
-      url: '/pages/ai/ai'
+
+  onTapDelete(e) {
+    const id = this.resolveNoteIdFromEvent(e)
+    if (!id) {
+      wx.showToast({ title: '无法删除该笔记', icon: 'none' })
+      return
+    }
+    wx.showModal({
+      title: '删除笔记',
+      content: '确定永久删除这条笔记？删除后不可恢复。',
+      confirmText: '删除',
+      cancelText: '取消',
+      confirmColor: '#dc2626',
+      success: (res) => {
+        if (res.confirm) {
+          dataService.hardDeleteNote(id)
+          wx.showToast({ title: '已删除', icon: 'success' })
+          this.loadData()
+        }
+      }
     })
   },
-  
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad: function (options) {
-    
-  },
-
-  /**
-   * 生命周期函数--监听页面初次渲染完成
-   */
-  onReady: function () {
-    
-  },
-
-  /**
-   * 生命周期函数--监听页面显示
-   */
-  onShow: function () {
-    
-  },
-
-  /**
-   * 生命周期函数--监听页面隐藏
-   */
-  onHide: function () {
-    
-  },
-
-  /**
-   * 生命周期函数--监听页面卸载
-   */
-  onUnload: function () {
-    
-  },
-
-  /**
-   * 页面相关事件处理函数--监听用户下拉动作
-   */
-  onPullDownRefresh: function () {
-    
-  },
-
-  /**
-   * 页面上拉触底事件的处理函数
-   */
-  onReachBottom: function () {
-    
-  },
-
-  /**
-   * 用户点击右上角分享
-   */
-  onShareAppMessage: function () {
-    
+  onTapNew() {
+    wx.navigateTo({ url: '/pages/editor/editor' })
   }
 })
