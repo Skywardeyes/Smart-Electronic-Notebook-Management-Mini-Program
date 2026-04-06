@@ -7,10 +7,6 @@
         <view class="user-id-label">云友 ID</view>
         <view class="user-id">#A93F</view>
       </view>
-      <view class="top-icons-left">
-        <icon type="search" size="20" class="icon-btn"></icon>
-        <icon type="info" size="20" class="icon-btn"></icon>
-      </view>
     </view>
     <view class="top-right">
       <view class="app-title">智能云笔记</view>

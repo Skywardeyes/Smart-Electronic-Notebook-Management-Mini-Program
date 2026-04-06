@@ -81,7 +81,12 @@ function extractImageItems(html) {
   while (im) {
     const src = im[1] || ''
     if (src && !seen.has(src)) {
-      out.push({ src, caption: '' })
+      const imgTag = im[0] || ''
+      const capAttr =
+        imgTag.match(/\sdata-caption=['"]([^'"]*)['"]/i) ||
+        imgTag.match(/\salt=['"]([^'"]*)['"]/i)
+      const caption = capAttr ? htmlToPlainText(capAttr[1] || '') : ''
+      out.push({ src, caption })
       seen.add(src)
     }
     im = imgRe.exec(s)
@@ -98,25 +103,18 @@ function setImageCaptionInHtml(html, src, caption) {
   if (!src) return s
   const safeCaption = escapeHtml((caption || '').trim())
   const esc = escapeRegExp(src)
-  const figureRe = new RegExp(
-    `<figure[^>]*>[\\s\\S]*?<img[^>]*src=['"]${esc}['"][^>]*>[\\s\\S]*?<\\/figure>`,
-    'i'
-  )
-  const fm = s.match(figureRe)
-  if (fm && fm[0]) {
-    let block = fm[0].replace(/<figcaption[^>]*>[\s\S]*?<\/figcaption>/i, '')
-    if (safeCaption) {
-      block = block.replace(/<\/figure>/i, `<figcaption>${safeCaption}</figcaption></figure>`)
-    }
-    return s.replace(fm[0], block)
-  }
   const imgRe = new RegExp(`<img[^>]*src=['"]${esc}['"][^>]*>`, 'i')
   const im = s.match(imgRe)
   if (!im || !im[0]) return s
-  const fig = safeCaption
-    ? `<figure class="note-image">${im[0]}<figcaption>${safeCaption}</figcaption></figure>`
-    : `<figure class="note-image">${im[0]}</figure>`
-  return s.replace(im[0], fig)
+  let imgTag = im[0]
+  // 只更新 img 属性，避免引入 figure/figcaption 导致编辑器丢图
+  imgTag = imgTag
+    .replace(/\sdata-caption=['"][^'"]*['"]/i, '')
+    .replace(/\salt=['"][^'"]*['"]/i, '')
+  if (safeCaption) {
+    imgTag = imgTag.replace(/>$/, ` alt="${safeCaption}" data-caption="${safeCaption}">`)
+  }
+  return s.replace(im[0], imgTag)
 }
 
 function normalizeTagsWithCategory(tags, preferredCategory) {
@@ -126,6 +124,22 @@ function normalizeTagsWithCategory(tags, preferredCategory) {
   const category = existed || (CATEGORY_TAGS.includes(preferredCategory) ? preferredCategory : CATEGORY_TAGS[0])
   const others = dedup.filter((t) => !CATEGORY_TAGS.includes(t))
   return [category].concat(others)
+}
+
+function buildSaveSignature(payload) {
+  const p = payload || {}
+  const tags = Array.isArray(p.tags) ? p.tags.slice() : []
+  return JSON.stringify({
+    id: p.id || '',
+    title: p.title || '',
+    content: p.content || '',
+    summary: p.summary || '',
+    tags
+  })
+}
+
+function generateDraftKey() {
+  return `draft_${Date.now()}_${Math.floor(Math.random() * 100000)}`
 }
 
 Page({
@@ -154,14 +168,24 @@ Page({
   },
 
   onLoad(options) {
-    const mode = options.mode || 'create'
-    const id = options.id || ''
+    const app = getApp()
+    // 优先消费全局编辑态，避免 onShow 之前误按“新建”路径保存出重复笔记
+    const globalMode = app && app.globalData ? app.globalData.editorMode : ''
+    const globalId = app && app.globalData ? app.globalData.editorNoteId : ''
+    const mode = options.mode || (globalId && globalMode === 'edit' ? 'edit' : 'create')
+    const id = options.id || (globalId && globalMode === 'edit' ? globalId : '')
     this._editingNoteId = id || ''
+    this._draftKey = id || generateDraftKey()
     this._isSaving = false
     this._editorReady = false
     this._editorCtx = null
     this._pendingContentHtml = '<p><br></p>'
+    this._lastSavedSignature = ''
     this.setData({ mode, noteId: id })
+    if (id && globalMode === 'edit') {
+      delete app.globalData.editorNoteId
+      delete app.globalData.editorMode
+    }
     if (mode === 'edit' && id) {
       this.loadNoteIntoEditor(id)
     } else {
@@ -180,6 +204,7 @@ Page({
         isDirty: false
       })
       this._editingNoteId = ''
+      this._draftKey = generateDraftKey()
     }
   },
 
@@ -187,7 +212,7 @@ Page({
     const app = getApp()
     const id = app.globalData.editorNoteId
     const mode = app.globalData.editorMode
-    if (id && mode === 'edit') {
+    if (id && mode === 'edit' && id !== this._editingNoteId) {
       delete app.globalData.editorNoteId
       delete app.globalData.editorMode
       this.loadNoteIntoEditor(id)
@@ -200,6 +225,7 @@ Page({
       const rawContent = note.content || ''
       const html = looksLikeHtml(rawContent) ? rawContent : plainTextToHtml(rawContent)
       this._editingNoteId = id
+      this._draftKey = id
       this._pendingContentHtml = html || '<p><br></p>'
       const imageItems = extractImageItems(this._pendingContentHtml)
       this.setData({
@@ -210,6 +236,13 @@ Page({
         contentText: htmlToPlainText(this._pendingContentHtml),
         imageList: imageItems.map((x) => x.src),
         imageItems,
+        summary: note.summary || '',
+        tags: note.tags || []
+      })
+      this._lastSavedSignature = buildSaveSignature({
+        id,
+        title: note.title || '',
+        content: this._pendingContentHtml,
         summary: note.summary || '',
         tags: note.tags || []
       })
@@ -509,6 +542,17 @@ Page({
     const { silent } = options
     const { title, content, summary, tags } = this.data
     const noteId = this._editingNoteId || this.data.noteId || ''
+    const nextSignature = buildSaveSignature({
+      id: noteId,
+      title,
+      content,
+      summary,
+      tags
+    })
+    if (nextSignature === this._lastSavedSignature) {
+      this._isSaving = false
+      return null
+    }
     if (!silent) {
       this.setData({ saving: true })
       wx.showLoading({ title: '保存中...', mask: true })
@@ -520,15 +564,24 @@ Page({
     try {
       const note = dataService.upsertNote({
         id: noteId || undefined,
+        draftKey: this._draftKey || undefined,
         title,
         content,
         summary,
         tags
       })
       this._editingNoteId = note.id
+      this._draftKey = note.id || this._draftKey
       this.setData({
         noteId: note.id,
         isDirty: false
+      })
+      this._lastSavedSignature = buildSaveSignature({
+        id: note.id,
+        title,
+        content,
+        summary,
+        tags
       })
       if (!silent) {
         wx.hideLoading()

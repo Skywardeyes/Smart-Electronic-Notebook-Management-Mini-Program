@@ -76,9 +76,23 @@ function upsertNote(note) {
   const now = nowISO()
 
   if (!note.id) {
+    // 无 id 的新建写入优先尝试按 draftKey 复用同一条，避免自动保存竞态导致重复插入
+    const draftKey = note.draftKey ? String(note.draftKey) : ''
+    if (draftKey) {
+      const existedIndex = notes.findIndex(n => String(n.draftKey || '') === draftKey)
+      if (existedIndex >= 0) {
+        notes[existedIndex] = Object.assign({}, notes[existedIndex], note, {
+          updateTime: now
+        })
+        target = notes[existedIndex]
+        saveArray(STORAGE_KEYS.NOTES, notes)
+        return target
+      }
+    }
     target = Object.assign(
       {
         id: generateNoteId(),
+        draftKey: note.draftKey || '',
         userId: 'demo_user',
         title: '',
         content: '',

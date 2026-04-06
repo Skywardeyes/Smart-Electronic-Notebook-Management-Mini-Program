@@ -44,15 +44,18 @@ function parseTagsFromAIResult(raw, count = 5) {
   return text
     .replace(/\r\n/g, '\n')
     .split(/[\n,，、;；|]+/)
-    .map((s) =>
-      s
+    .map((s) => {
+      const cleaned = s
         .trim()
         // 清理常见列表前缀：-、*、1.、1)、（1）等
         .replace(/^[-*#\s]+/, '')
         .replace(/^[（(]?\d+[)）.\s]+/, '')
         .replace(/^标签[:：]\s*/i, '')
         .trim()
-    )
+      // 分类标签保持原样；其余标签保持模型原始长度
+      if (CATEGORY_TAGS.includes(cleaned)) return cleaned
+      return cleaned
+    })
     .filter(Boolean)
     .slice(0, Math.max(1, Number(count) || 5))
 }
@@ -75,7 +78,7 @@ function mockRequestAI(prompt) {
       } else if (text.includes('摘要')) {
         result = '这是一段模拟的AI生成摘要，用于开发阶段展示效果。'
       } else if (text.includes('标签')) {
-        result = 'AI,笔记,智能管理'
+        result = '学习笔记,复习计划,知识点,错题整理,考试准备'
       }
       resolve(result)
     }, randomDelay())
@@ -139,17 +142,21 @@ function generateSummary(content, length = 150) {
 }
 
 function extractTags(content, count = 5) {
+  const total = Math.max(2, Number(count) || 5)
+  const keywordCount = total - 1
   const prompt = `你是一个专业的笔记整理助手，擅长处理文本分析和知识管理任务。
 
-请从以下内容中提取 ${count} 个标签，并严格遵守：
-1) 结果中必须包含且仅包含 1 个分类标签，且只能从「${CATEGORY_TAGS.join(' / ')}」中选择；
-2) 其余标签为内容关键词，不要与分类标签重复；
-3) 仅输出标签本身，用中文逗号分隔，不要解释。
+请从以下内容中提取共 ${total} 个标签，并严格遵守：
+1) 第一个标签必须是一个类别标签，包含且仅包含 1 个类别标签，且只能从「${CATEGORY_TAGS.join(' / ')}」中选择；
+2) 除分类标签外，还必须给出 ${keywordCount} 个内容关键词标签（短标签）；
+3) 不能只返回分类标签，必须同时包含分类标签 + 关键词标签；
+4) 标签不要重复，不要出现“标签/分类/笔记”等泛词；
+5) 仅输出标签本身，用中文逗号分隔，不要解释、不要换行。
 
 待分析内容：
 ${content || ''}`
   return requestAI(prompt, { workspaceType: 'chat', mode: 'chat' }).then((str) => {
-    return parseTagsFromAIResult(str, count)
+    return parseTagsFromAIResult(str, total)
   })
 }
 
