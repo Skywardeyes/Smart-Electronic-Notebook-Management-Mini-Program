@@ -276,7 +276,9 @@ Page({
     const attachTag = this.data.attachTag
     this.setData({ loading: true })
     try {
-      const answer = await aiService.askQuestion(built.merged, '')
+      const answer = attachTag
+        ? await aiService.requestAI(built.merged, { max_tokens: 512 })
+        : await aiService.askQuestion(built.merged, '')
       const history = this.data.qaHistory.concat([
         { role: 'user', content: built.displayUser },
         { role: 'assistant', content: answer }

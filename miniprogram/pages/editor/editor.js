@@ -3,6 +3,130 @@ const aiService = require('../../utils/aiService.js')
 const aiPrefill = require('../../utils/aiPrefill.js')
 
 let autoSaveTimer = null
+const FONT_SIZE_OPTIONS = [14, 16, 18, 22]
+const CATEGORY_TAGS = ['学习笔记', '工作记录', '生活']
+const COLOR_OPTIONS = [
+  { label: '默认', value: '#000000' },
+  { label: '红色', value: '#dc2626' },
+  { label: '蓝色', value: '#2563eb' },
+  { label: '绿色', value: '#16a34a' },
+  { label: '紫色', value: '#7c3aed' }
+]
+const HIGHLIGHT_OPTIONS = [
+  { label: '默认', value: 'transparent' },
+  { label: '黄色高亮', value: '#fef08a' },
+  { label: '绿色高亮', value: '#bbf7d0' },
+  { label: '蓝色高亮', value: '#bfdbfe' },
+  { label: '粉色高亮', value: '#fbcfe8' }
+]
+
+function looksLikeHtml(text) {
+  const s = String(text || '')
+  return /<\/?[a-z][\s\S]*>/i.test(s)
+}
+
+function escapeHtml(text) {
+  return String(text || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+}
+
+function plainTextToHtml(text) {
+  const lines = String(text || '').split(/\r?\n/)
+  if (!lines.length) return '<p><br></p>'
+  return lines
+    .map((line) => {
+      if (!line.trim()) return '<p><br></p>'
+      return `<p>${escapeHtml(line)}</p>`
+    })
+    .join('')
+}
+
+function htmlToPlainText(html) {
+  const s = String(html || '')
+  return s
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|li|h1|h2|h3|h4|h5|h6)>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
+function extractImageItems(html) {
+  const s = String(html || '')
+  const out = []
+  const seen = new Set()
+  const figureRe = /<figure[\s\S]*?<img[\s\S]*?src=['"]([^'"]+)['"][\s\S]*?>([\s\S]*?)<\/figure>/gi
+  let fm = figureRe.exec(s)
+  while (fm) {
+    const src = fm[1] || ''
+    const tail = fm[2] || ''
+    const capMatch = tail.match(/<figcaption[^>]*>([\s\S]*?)<\/figcaption>/i)
+    const caption = htmlToPlainText(capMatch ? capMatch[1] : '')
+    if (src && !seen.has(src)) {
+      out.push({ src, caption })
+      seen.add(src)
+    }
+    fm = figureRe.exec(s)
+  }
+  const imgRe = /<img[\s\S]*?src=['"]([^'"]+)['"][\s\S]*?>/gi
+  let im = imgRe.exec(s)
+  while (im) {
+    const src = im[1] || ''
+    if (src && !seen.has(src)) {
+      out.push({ src, caption: '' })
+      seen.add(src)
+    }
+    im = imgRe.exec(s)
+  }
+  return out
+}
+
+function escapeRegExp(str) {
+  return String(str || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+function setImageCaptionInHtml(html, src, caption) {
+  const s = String(html || '')
+  if (!src) return s
+  const safeCaption = escapeHtml((caption || '').trim())
+  const esc = escapeRegExp(src)
+  const figureRe = new RegExp(
+    `<figure[^>]*>[\\s\\S]*?<img[^>]*src=['"]${esc}['"][^>]*>[\\s\\S]*?<\\/figure>`,
+    'i'
+  )
+  const fm = s.match(figureRe)
+  if (fm && fm[0]) {
+    let block = fm[0].replace(/<figcaption[^>]*>[\s\S]*?<\/figcaption>/i, '')
+    if (safeCaption) {
+      block = block.replace(/<\/figure>/i, `<figcaption>${safeCaption}</figcaption></figure>`)
+    }
+    return s.replace(fm[0], block)
+  }
+  const imgRe = new RegExp(`<img[^>]*src=['"]${esc}['"][^>]*>`, 'i')
+  const im = s.match(imgRe)
+  if (!im || !im[0]) return s
+  const fig = safeCaption
+    ? `<figure class="note-image">${im[0]}<figcaption>${safeCaption}</figcaption></figure>`
+    : `<figure class="note-image">${im[0]}</figure>`
+  return s.replace(im[0], fig)
+}
+
+function normalizeTagsWithCategory(tags, preferredCategory) {
+  const list = Array.isArray(tags) ? tags.map((x) => String(x || '').trim()).filter(Boolean) : []
+  const dedup = Array.from(new Set(list))
+  const existed = dedup.find((t) => CATEGORY_TAGS.includes(t))
+  const category = existed || (CATEGORY_TAGS.includes(preferredCategory) ? preferredCategory : CATEGORY_TAGS[0])
+  const others = dedup.filter((t) => !CATEGORY_TAGS.includes(t))
+  return [category].concat(others)
+}
 
 Page({
   data: {
@@ -15,7 +139,18 @@ Page({
     newTagInput: '',
     isDirty: false,
     saving: false,
-    aiLoading: false
+    aiLoading: false,
+    contentText: '',
+    activeFormats: {
+      bold: false,
+      italic: false,
+      underline: false,
+      strike: false,
+      header: false,
+      list: false
+    },
+    imageList: [],
+    imageItems: []
   },
 
   onLoad(options) {
@@ -23,6 +158,9 @@ Page({
     const id = options.id || ''
     this._editingNoteId = id || ''
     this._isSaving = false
+    this._editorReady = false
+    this._editorCtx = null
+    this._pendingContentHtml = '<p><br></p>'
     this.setData({ mode, noteId: id })
     if (mode === 'edit' && id) {
       this.loadNoteIntoEditor(id)
@@ -33,6 +171,9 @@ Page({
         noteId: '',
         title: '',
         content: '',
+        contentText: '',
+        imageList: [],
+        imageItems: [],
         summary: '',
         tags: [],
         newTagInput: '',
@@ -56,15 +197,25 @@ Page({
   loadNoteIntoEditor(id) {
     const note = dataService.getNoteById(id)
     if (note) {
+      const rawContent = note.content || ''
+      const html = looksLikeHtml(rawContent) ? rawContent : plainTextToHtml(rawContent)
       this._editingNoteId = id
+      this._pendingContentHtml = html || '<p><br></p>'
+      const imageItems = extractImageItems(this._pendingContentHtml)
       this.setData({
         mode: 'edit',
         noteId: id,
         title: note.title || '',
-        content: note.content || '',
+        content: this._pendingContentHtml,
+        contentText: htmlToPlainText(this._pendingContentHtml),
+        imageList: imageItems.map((x) => x.src),
+        imageItems,
         summary: note.summary || '',
         tags: note.tags || []
       })
+      if (this._editorReady && this._editorCtx) {
+        this._editorCtx.setContents({ html: this._pendingContentHtml })
+      }
     }
   },
 
@@ -87,8 +238,225 @@ Page({
   },
 
   onContentInput(e) {
-    this.setData({ content: e.detail.value, isDirty: true })
+    const value = e.detail.value || ''
+    this.setData({ content: value, contentText: htmlToPlainText(value), isDirty: true })
     this.scheduleAutoSave()
+  },
+
+  onEditorReady() {
+    wx.createSelectorQuery()
+      .in(this)
+      .select('#noteEditor')
+      .context((res) => {
+        if (!res || !res.context) return
+        this._editorCtx = res.context
+        this._editorReady = true
+        this._editorCtx.setContents({
+          html: this._pendingContentHtml || this.data.content || '<p><br></p>'
+        })
+      })
+      .exec()
+  },
+
+  onEditorInput(e) {
+    const html = (e.detail && e.detail.html) || ''
+    const text = (e.detail && e.detail.text) || htmlToPlainText(html)
+    const imageItems = extractImageItems(html)
+    this.setData({
+      content: html,
+      contentText: String(text || '').trim(),
+      imageList: imageItems.map((x) => x.src),
+      imageItems,
+      isDirty: true
+    })
+    this.scheduleAutoSave()
+  },
+
+  onEditorStatusChange(e) {
+    const f = (e.detail || {})
+    this.setData({
+      activeFormats: {
+        bold: !!f.bold,
+        italic: !!f.italic,
+        underline: !!f.underline,
+        strike: !!f.strike,
+        header: !!f.header,
+        list: !!f.list
+      }
+    })
+  },
+
+  onFormatTap(e) {
+    const cmd = e.currentTarget.dataset.cmd
+    if (!this._editorCtx) return
+    if (cmd === 'fontSize') {
+      this.onPickFontSize()
+      return
+    }
+    if (cmd === 'image') {
+      this.onInsertImagePlaceholder()
+      return
+    }
+    if (cmd === 'undo') {
+      this._editorCtx.undo()
+      return
+    }
+    if (cmd === 'redo') {
+      this._editorCtx.redo()
+      return
+    }
+    if (cmd === 'color') {
+      this.onPickTextColor()
+      return
+    }
+    if (cmd === 'highlight') {
+      this.onPickHighlightColor()
+      return
+    }
+    if (cmd === 'header') {
+      const next = this.data.activeFormats.header ? false : 'H2'
+      this._editorCtx.format('header', next)
+      return
+    }
+    if (cmd === 'list') {
+      const next = this.data.activeFormats.list ? false : 'bullet'
+      this._editorCtx.format('list', next)
+      return
+    }
+    this._editorCtx.format(cmd)
+  },
+
+  onPickFontSize() {
+    if (!this._editorCtx) return
+    wx.showActionSheet({
+      itemList: FONT_SIZE_OPTIONS.map((n) => `${n}px`),
+      success: (res) => {
+        const idx = res.tapIndex
+        if (idx < 0 || idx >= FONT_SIZE_OPTIONS.length) return
+        this._editorCtx.format('fontSize', `${FONT_SIZE_OPTIONS[idx]}px`)
+      }
+    })
+  },
+
+  onPickTextColor() {
+    if (!this._editorCtx) return
+    wx.showActionSheet({
+      itemList: COLOR_OPTIONS.map((x) => x.label),
+      success: (res) => {
+        const idx = res.tapIndex
+        if (idx < 0 || idx >= COLOR_OPTIONS.length) return
+        this._editorCtx.format('color', COLOR_OPTIONS[idx].value)
+      }
+    })
+  },
+
+  onPickHighlightColor() {
+    if (!this._editorCtx) return
+    wx.showActionSheet({
+      itemList: HIGHLIGHT_OPTIONS.map((x) => x.label),
+      success: (res) => {
+        const idx = res.tapIndex
+        if (idx < 0 || idx >= HIGHLIGHT_OPTIONS.length) return
+        this._editorCtx.format('backgroundColor', HIGHLIGHT_OPTIONS[idx].value)
+      }
+    })
+  },
+
+  onInsertImagePlaceholder() {
+    if (!this._editorCtx) return
+    wx.chooseMedia({
+      count: 9,
+      mediaType: ['image'],
+      sourceType: ['album', 'camera'],
+      success: (res) => {
+        const files = (res.tempFiles || []).filter((f) => f && f.tempFilePath)
+        if (!files.length) return
+        files.forEach((f) => {
+          this._editorCtx.insertImage({
+            src: f.tempFilePath,
+            alt: '本地图片',
+            success: () => {}
+          })
+        })
+      },
+      fail: () => {
+        wx.showToast({ title: '未选择图片', icon: 'none' })
+      }
+    })
+  },
+
+  onPreviewInsertedImage(e) {
+    const src = e.currentTarget.dataset.src
+    if (!src) return
+    const urls = (this.data.imageList || []).filter(Boolean)
+    wx.previewImage({
+      current: src,
+      urls: urls.length ? urls : [src]
+    })
+  },
+
+  onEditImageCaption(e) {
+    const src = e.currentTarget.dataset.src
+    if (!src) return
+    const row = (this.data.imageItems || []).find((x) => x.src === src)
+    wx.showModal({
+      title: '图片说明',
+      editable: true,
+      placeholderText: '请输入图片说明（可选）',
+      content: row && row.caption ? row.caption : '',
+      success: (res) => {
+        if (!res.confirm) return
+        const nextHtml = setImageCaptionInHtml(this.data.content || '', src, res.content || '')
+        const safeHtml = nextHtml.trim() ? nextHtml : '<p><br></p>'
+        const imageItems = extractImageItems(safeHtml)
+        this.setData({
+          content: safeHtml,
+          contentText: htmlToPlainText(safeHtml),
+          imageList: imageItems.map((x) => x.src),
+          imageItems,
+          isDirty: true
+        })
+        if (this._editorCtx) {
+          this._editorCtx.setContents({ html: safeHtml })
+        }
+        this.scheduleAutoSave()
+      }
+    })
+  },
+
+  onDeleteInsertedImage(e) {
+    const src = e.currentTarget.dataset.src
+    if (!src) return
+    wx.showModal({
+      title: '删除图片',
+      content: '确定删除这张图片吗？',
+      confirmText: '删除',
+      confirmColor: '#dc2626',
+      success: (res) => {
+        if (!res.confirm) return
+        const html = String(this.data.content || '')
+        if (!html) return
+        const re = new RegExp(
+          `<img[^>]*src=['"]${escapeRegExp(src)}['"][^>]*>`,
+          'gi'
+        )
+        const nextHtml = html.replace(re, '')
+        const safeHtml = nextHtml.trim() ? nextHtml : '<p><br></p>'
+        const imageItems = extractImageItems(safeHtml)
+        this.setData({
+          content: safeHtml,
+          contentText: htmlToPlainText(safeHtml),
+          imageList: imageItems.map((x) => x.src),
+          imageItems,
+          isDirty: true
+        })
+        if (this._editorCtx) {
+          this._editorCtx.setContents({ html: safeHtml })
+        }
+        this.scheduleAutoSave()
+        wx.showToast({ title: '已删除图片', icon: 'success' })
+      }
+    })
   },
 
   onSummaryInput(e) {
@@ -190,10 +558,10 @@ Page({
   },
 
   async onAIGenerateTitle() {
-    if (!this.data.content && !this.data.title) return
+    if (!this.data.contentText && !this.data.title) return
     this.setData({ aiLoading: true })
     try {
-      const title = await aiService.generateTitle(this.data.content || this.data.title)
+      const title = await aiService.generateTitle(this.data.contentText || this.data.title)
       this.setData({ title, isDirty: true })
       this.scheduleAutoSave()
     } catch (e) {
@@ -204,10 +572,10 @@ Page({
   },
 
   async onAIGenerateSummary() {
-    if (!this.data.content) return
+    if (!this.data.contentText) return
     this.setData({ aiLoading: true })
     try {
-      const summary = await aiService.generateSummary(this.data.content, 120)
+      const summary = await aiService.generateSummary(this.data.contentText, 120)
       this.setData({ summary, isDirty: true })
       this.scheduleAutoSave()
     } catch (e) {
@@ -239,12 +607,12 @@ Page({
 
   /** 当前正文全文 → AI 问答页（标签为当前标题，正文含未保存内容写入临时文件） */
   onAskFullBodyForAI() {
-    const t = (this.data.content || '').trim()
+    const t = (this.data.contentText || '').trim()
     if (!t) {
       wx.showToast({ title: '正文为空', icon: 'none' })
       return
     }
-    aiPrefill.navigateWithFullNoteFromEditor(this.data.title, this.data.content)
+    aiPrefill.navigateWithFullNoteFromEditor(this.data.title, this.data.contentText)
   },
 
   /** 长按正文区域：快捷菜单 */
@@ -259,12 +627,14 @@ Page({
   },
 
   async onAIExtractTags() {
-    if (!this.data.content && !this.data.title) return
+    if (!this.data.contentText && !this.data.title) return
     this.setData({ aiLoading: true })
     try {
-      const tags = await aiService.extractTags(this.data.content || this.data.title, 5)
+      const tags = await aiService.extractTags(this.data.contentText || this.data.title, 5)
+      const currentCategory = (this.data.tags || []).find((t) => CATEGORY_TAGS.includes(t))
+      const merged = normalizeTagsWithCategory([].concat(this.data.tags || [], tags || []), currentCategory)
       this.setData({
-        tags: Array.from(new Set([].concat(this.data.tags || [], tags || []))),
+        tags: merged,
         isDirty: true
       })
       this.scheduleAutoSave()

@@ -1,4 +1,25 @@
 const dataService = require('../../utils/dataService.js')
+const CATEGORY_TAGS = ['学习笔记', '工作记录', '生活']
+
+function htmlToPlainText(html) {
+  return String(html || '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|li|h1|h2|h3|h4|h5|h6)>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
+function getCategoryTag(tags) {
+  const list = Array.isArray(tags) ? tags : []
+  return list.find((t) => CATEGORY_TAGS.includes(t)) || ''
+}
 
 Page({
   data: {
@@ -59,20 +80,23 @@ Page({
       .filter((n) => {
         if (
           activeCategoryId !== 'all' &&
-          n.category !== activeCategoryId &&
-          n.category !== this.findCategoryName(activeCategoryId)
+          getCategoryTag(n.tags || []) !== this.findCategoryName(activeCategoryId)
         ) {
           return false
         }
         if (!kw) return true
-        const text = `${n.title || ''} ${n.content || ''} ${(n.tags || []).join(' ')}`
+        const plain = htmlToPlainText(n.content || '')
+        const text = `${n.title || ''} ${plain} ${(n.tags || []).join(' ')}`
         return text.toLowerCase().includes(kw)
       })
       .map((n) => {
         const dateStr = (n.updateTime || n.createTime || '').slice(0, 10)
+        const snippetText = htmlToPlainText(n.content || '')
         return Object.assign({}, n, {
           dateText: dateStr,
-          tagCount: (n.tags && n.tags.length) || 0
+          tagCount: (n.tags && n.tags.length) || 0,
+          snippetText,
+          categoryText: getCategoryTag(n.tags || []) || n.category || '默认'
         })
       })
     this.setData({ filteredNotes: list })

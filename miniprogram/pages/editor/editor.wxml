@@ -49,15 +49,41 @@
           <text class="text-link" catchtap="onAskFullBodyForAI">全文问AI</text>
         </view>
       </view>
+      <view class="editor-toolbar">
+        <view class="toolbar-btn" data-cmd="undo" bindtap="onFormatTap">←</view>
+        <view class="toolbar-btn" data-cmd="redo" bindtap="onFormatTap">→</view>
+        <view class="toolbar-btn {{activeFormats.bold ? 'toolbar-btn-active' : ''}}" data-cmd="bold" bindtap="onFormatTap">B</view>
+        <view class="toolbar-btn {{activeFormats.italic ? 'toolbar-btn-active' : ''}}" data-cmd="italic" bindtap="onFormatTap">I</view>
+        <view class="toolbar-btn {{activeFormats.underline ? 'toolbar-btn-active' : ''}}" data-cmd="underline" bindtap="onFormatTap">U</view>
+        <view class="toolbar-btn {{activeFormats.strike ? 'toolbar-btn-active' : ''}}" data-cmd="strike" bindtap="onFormatTap">S</view>
+        <view class="toolbar-btn {{activeFormats.header ? 'toolbar-btn-active' : ''}}" data-cmd="header" bindtap="onFormatTap">H</view>
+        <view class="toolbar-btn {{activeFormats.list ? 'toolbar-btn-active' : ''}}" data-cmd="list" bindtap="onFormatTap">列表</view>
+        <view class="toolbar-btn" data-cmd="color" bindtap="onFormatTap">文字色</view>
+        <view class="toolbar-btn" data-cmd="highlight" bindtap="onFormatTap">高亮</view>
+        <view class="toolbar-btn" data-cmd="fontSize" bindtap="onFormatTap">字号</view>
+        <view class="toolbar-btn" data-cmd="image" bindtap="onFormatTap">图片</view>
+      </view>
       <view class="hint-muted">拖选后系统「复制」，再点「选区问AI」：AI 页底部会显示「剪贴板内容」标签，输入框保持空白，输入问题后发送即可合并上下文。（系统菜单无法增加自定义项）</view>
-      <textarea class="editor-textarea"
-                placeholder="在这里记录内容，支持 Markdown 风格输入，例如：# 一级标题、- 列表项 等。"
-                value="{{content}}"
-                bindinput="onContentInput"
-                maxlength="-1"
-                fixed="true"
-                show-confirm-bar="false"
-                auto-height="true" />
+      <editor id="noteEditor"
+              class="editor-richtext"
+              placeholder="在这里记录内容..."
+              show-img-size="true"
+              show-img-toolbar="true"
+              show-img-resize="true"
+              bindready="onEditorReady"
+              bindinput="onEditorInput"
+              bindstatuschange="onEditorStatusChange" />
+      <view class="image-manager" wx:if="{{imageList.length}}">
+        <view class="image-manager-title">已插入图片（点击删除）</view>
+        <view class="image-chip-list">
+          <view class="image-chip" wx:for="{{imageItems}}" wx:key="src">
+            <text class="image-chip-text" data-src="{{item.src}}" bindtap="onPreviewInsertedImage">图片{{index + 1}}</text>
+            <text class="image-chip-caption">{{item.caption || '（无说明）'}}</text>
+            <text class="image-chip-edit" data-src="{{item.src}}" bindtap="onEditImageCaption">说明</text>
+            <text class="image-chip-del" data-src="{{item.src}}" bindtap="onDeleteInsertedImage">删除</text>
+          </view>
+        </view>
+      </view>
     </view>
   </view>
 

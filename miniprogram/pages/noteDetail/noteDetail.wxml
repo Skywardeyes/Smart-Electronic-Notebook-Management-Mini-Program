@@ -53,7 +53,7 @@
         </view>
       </view>
       <view class="hint-muted">拖选后复制，再点「选区问AI」：AI 页显示「剪贴板内容」标签；「全文问AI」显示笔记标题标签，输入问题后发送合并。（系统菜单无法增加自定义项）</view>
-      <text class="note-content" selectable>{{note.content || '暂无内容'}}</text>
+      <text class="note-content" selectable>{{note.contentText || '暂无内容'}}</text>
     </view>
   </view>
 

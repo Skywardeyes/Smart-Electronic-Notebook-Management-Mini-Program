@@ -2,7 +2,7 @@
   <view class="page-header">
     <view>
       <view class="page-title">AI 智能助手</view>
-      <view class="page-subtitle">问答与扩写；摘要请在笔记编辑页生成</view>
+      <view class="page-subtitle">问答与润色；摘要请在笔记编辑页生成</view>
     </view>
   </view>
 
@@ -12,7 +12,7 @@
         问答模式
       </view>
       <view class="mode-pill {{mode==='polish' ? 'mode-pill-active' : ''}}" data-mode="polish" bindtap="switchMode">
-        扩写模式
+        润色模式
       </view>
     </view>
   </view>
@@ -78,7 +78,7 @@
     <view class="card">
       <view class="section-title">需要润色的文本</view>
       <textarea class="ai-textarea"
-                placeholder="输入需要润色或扩写的内容"
+                placeholder="输入需要润色的内容"
                 value="{{inputText}}"
                 bindinput="onInput"
                 auto-height="true" />
@@ -100,7 +100,7 @@
     </view>
     <view class="ai-input-row">
       <textarea class="ai-input"
-                placeholder="{{mode==='qa' && attachTag ? '输入您的问题…' : (mode==='qa' ? '向 AI 提问...' : '输入或粘贴内容...')}}"
+                placeholder="{{mode==='qa' && attachTag ? '输入您的问题…' : (mode==='qa' ? '向 AI 提问...' : '输入需要润色的内容...')}}"
                 value="{{inputText}}"
                 bindinput="onInput"
                 auto-height="true" />

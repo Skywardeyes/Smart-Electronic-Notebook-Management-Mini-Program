@@ -2,6 +2,21 @@ const dataService = require('../../utils/dataService.js')
 const aiService = require('../../utils/aiService.js')
 const aiPrefill = require('../../utils/aiPrefill.js')
 
+function htmlToPlainText(html) {
+  return String(html || '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|li|h1|h2|h3|h4|h5|h6)>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
 Page({
   data: {
     noteId: '',
@@ -24,10 +39,11 @@ Page({
       this.setData({ note: null })
       return
     }
+    const contentText = htmlToPlainText(note.content || '')
     const create = (note.createTime || '').replace('T', ' ').slice(0, 16)
     const update = (note.updateTime || '').replace('T', ' ').slice(0, 16)
     this.setData({
-      note,
+      note: Object.assign({}, note, { contentText }),
       createTimeText: create,
       updateTimeText: update,
       aiSummary: note.summary || ''
@@ -39,7 +55,7 @@ Page({
     if (!note) return
     this.setData({ aiLoading: true })
     try {
-      const summary = await aiService.generateSummary(note.content || note.title || '', 120)
+      const summary = await aiService.generateSummary(note.contentText || note.title || '', 120)
       this.setData({ aiSummary: summary })
     } catch (e) {
       wx.showToast({ title: '生成失败', icon: 'none' })
@@ -92,7 +108,7 @@ Page({
 
   onAskFullBodyForAI() {
     const note = this.data.note
-    const t = (note && note.content ? String(note.content) : '').trim()
+    const t = (note && note.contentText ? String(note.contentText) : '').trim()
     if (!t) {
       wx.showToast({ title: '正文为空', icon: 'none' })
       return

@@ -1,4 +1,5 @@
 const AI_CONFIG = require('../config/ai.config.js')
+const CATEGORY_TAGS = ['学习笔记', '工作记录', '生活']
 
 const DEFAULT_DELAY_MIN = 800
 const DEFAULT_DELAY_MAX = 1500
@@ -24,22 +25,7 @@ function stripThinkingOutput(raw) {
     if (tail) return tail
   }
 
-  // 2) 兜底：提取“最终响应/Final decision”中的最终答案
-  const finalMatch = s.match(
-    /(最终响应|Final\s+decision)\s*[：:]\s*(?:"([^"]*)"|'([^']*)'|「([^」]*)」|([^\n]+))/i
-  )
-  if (finalMatch) {
-    const out = (
-      finalMatch[2] ||
-      finalMatch[3] ||
-      finalMatch[4] ||
-      finalMatch[5] ||
-      ''
-    ).trim()
-    if (out) return out.replace(/^["'「]+|["'」]+$/g, '').trim()
-  }
-
-  // 3) 再兜底：移除完整 think 块
+  // 2) 再兜底：移除完整 think 块
   s = s
     .replace(/<think>[\s\S]*?<\/think>/gi, '')
     .replace(/```(?:think|thinking|reasoning|思考)[\s\S]*?```/gi, '')
@@ -47,6 +33,28 @@ function stripThinkingOutput(raw) {
 
   if (s) return s
   return original
+}
+
+/**
+ * 将模型返回的标签文本解析为数组，兼容逗号/顿号/分号/换行/编号列表等格式。
+ */
+function parseTagsFromAIResult(raw, count = 5) {
+  const text = String(raw || '').trim()
+  if (!text) return []
+  return text
+    .replace(/\r\n/g, '\n')
+    .split(/[\n,，、;；|]+/)
+    .map((s) =>
+      s
+        .trim()
+        // 清理常见列表前缀：-、*、1.、1)、（1）等
+        .replace(/^[-*#\s]+/, '')
+        .replace(/^[（(]?\d+[)）.\s]+/, '')
+        .replace(/^标签[:：]\s*/i, '')
+        .trim()
+    )
+    .filter(Boolean)
+    .slice(0, Math.max(1, Number(count) || 5))
 }
 
 /** 本地模拟（不含任何密钥，仅 USE_MOCK_AI 时使用） */
@@ -112,7 +120,16 @@ function requestAI(prompt, options = {}) {
 }
 
 function generateTitle(content) {
-  const prompt = `你是一个专业的笔记整理助手，擅长处理文本分析和知识管理任务。\n\n请根据以下内容生成一个简洁准确的标题（不超过20字），仅输出标题，不要输出其他内容：\n\n${content || ''}`
+  const prompt = `你是一个专业的笔记整理助手，擅长处理文本分析和知识管理任务。
+
+请根据以下内容生成一个简短准确的中文标题，并严格遵守：
+1) 标题尽量控制在 8-12 个字；
+2) 最长不超过 15 个字；
+3) 不要使用标点符号结尾；
+4) 仅输出标题本身，不要解释、不要前后缀。
+
+内容如下：
+${content || ''}`
   return requestAI(prompt, { workspaceType: 'chat', mode: 'chat' })
 }
 
@@ -122,12 +139,17 @@ function generateSummary(content, length = 150) {
 }
 
 function extractTags(content, count = 5) {
-  const prompt = `你是一个专业的笔记整理助手，擅长处理文本分析和知识管理任务。\n\n请从以下内容中提取 ${count} 个关键词作为标签，用逗号分隔，仅输出标签，不要输出其他内容：\n\n${content || ''}`
+  const prompt = `你是一个专业的笔记整理助手，擅长处理文本分析和知识管理任务。
+
+请从以下内容中提取 ${count} 个标签，并严格遵守：
+1) 结果中必须包含且仅包含 1 个分类标签，且只能从「${CATEGORY_TAGS.join(' / ')}」中选择；
+2) 其余标签为内容关键词，不要与分类标签重复；
+3) 仅输出标签本身，用中文逗号分隔，不要解释。
+
+待分析内容：
+${content || ''}`
   return requestAI(prompt, { workspaceType: 'chat', mode: 'chat' }).then((str) => {
-    return String(str)
-      .split(/[，,]/)
-      .map((s) => s.trim())
-      .filter(Boolean)
+    return parseTagsFromAIResult(str, count)
   })
 }
 

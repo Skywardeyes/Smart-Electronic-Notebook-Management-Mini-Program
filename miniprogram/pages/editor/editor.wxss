@@ -60,6 +60,90 @@
   font-size: 28rpx;
 }
 
+.editor-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin: 12rpx 0 14rpx;
+}
+
+.toolbar-btn {
+  min-width: 68rpx;
+  padding: 8rpx 14rpx;
+  border-radius: 10rpx;
+  border: 1px solid #ddd6fe;
+  background-color: #f8fafc;
+  color: #4c1d95;
+  font-size: 22rpx;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.toolbar-btn-active {
+  background-color: #ede9fe;
+  border-color: #a78bfa;
+  color: #5b21b6;
+}
+
+.editor-richtext {
+  width: 100%;
+  min-height: 420rpx;
+  padding: 16rpx 18rpx;
+  box-sizing: border-box;
+  border-radius: 12rpx;
+  border: 1px solid #eeeeee;
+  background-color: #ffffff;
+}
+
+.image-manager {
+  margin-top: 14rpx;
+}
+
+.image-manager-title {
+  font-size: 22rpx;
+  color: #64748b;
+  margin-bottom: 10rpx;
+}
+
+.image-chip-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.image-chip {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  padding: 8rpx 12rpx;
+  border-radius: 999rpx;
+  background: #eef2ff;
+}
+
+.image-chip-text {
+  font-size: 22rpx;
+  color: #3730a3;
+}
+
+.image-chip-caption {
+  font-size: 22rpx;
+  color: #475569;
+  max-width: 220rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.image-chip-edit {
+  font-size: 22rpx;
+  color: #2563eb;
+}
+
+.image-chip-del {
+  font-size: 22rpx;
+  color: #dc2626;
+}
+
 .tag-row {
   margin-top: 16rpx;
 }

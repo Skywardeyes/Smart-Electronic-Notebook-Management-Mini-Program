@@ -74,10 +74,10 @@
             <text class="note-meta">{{note.dateText}}</text>
           </view>
           <view class="note-meta">
-            {{note.category || '默认'}} · {{note.tagCount}} 标签
+            {{note.categoryText || '默认'}} · {{note.tagCount}} 标签
           </view>
           <view class="note-snippet">
-            {{note.content || '暂无内容'}}
+            {{note.snippetText || '暂无内容'}}
           </view>
         </view>
         <view class="note-card-menu"
