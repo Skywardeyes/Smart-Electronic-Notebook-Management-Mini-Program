@@ -1,0 +1,15 @@
+<view class="page-container">
+  <view class="page-header">
+    <view>
+      <view class="page-title">使用帮助</view>
+      <view class="page-subtitle">常见问题与操作说明</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card" wx:for="{{faqs}}" wx:key="q">
+      <view class="q">{{item.q}}</view>
+      <view class="a">{{item.a}}</view>
+    </view>
+  </view>
+</view>

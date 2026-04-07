@@ -91,6 +91,36 @@
   </view>
 
   <view class="fixed-footer">
+    <view class="note-picker-bar" wx:if="{{mode==='qa' && contextType !== 'history'}}">
+      <view class="note-picker-head">
+        <text class="note-picker-title">笔记上下文：已选 {{selectedNoteCount}} 篇</text>
+        <view class="note-picker-ops">
+          <text class="note-op" bindtap="toggleSelectAllNotes">全选</text>
+          <text class="note-op" bindtap="clearSelectedNotes">清空</text>
+          <text class="note-op note-op-main" bindtap="toggleNotePicker">{{notePickerOpen ? '收起' : '选择笔记'}}</text>
+        </view>
+      </view>
+      <scroll-view class="note-picker-list" wx:if="{{notePickerOpen}}" scroll-y>
+        <view class="note-picker-item"
+              wx:for="{{allNotes}}"
+              wx:key="id"
+              data-id="{{item.id}}"
+              bindtap="toggleNoteSelect">
+          <view class="note-picker-check {{item.pickerSelected ? 'note-picker-check-on' : ''}}">
+            <text class="note-picker-check-mark" wx:if="{{item.pickerSelected}}">✓</text>
+          </view>
+          <view class="note-picker-body">
+            <view class="note-picker-item-title">{{item.title}}</view>
+            <view class="note-picker-item-preview">{{item.preview || '暂无摘要'}}</view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view class="attach-tag-bar" wx:if="{{mode==='qa' && contextType !== 'history' && contextTruncated}}">
+      <text class="attach-tag-hint">已对上下文进行截断以适配模型长度</text>
+    </view>
+
     <view class="attach-tag-bar" wx:if="{{mode==='qa' && contextType !== 'history' && attachTag}}">
       <view class="attach-tag-chip">
         <text class="attach-tag-text">{{attachTag.label}}</text>

@@ -6,7 +6,6 @@ Page({
     stats: {
       totalNotes: 0,
       thisMonthNew: 0,
-      aiUsage: 0,
       storageUsage: '—'
     }
   },
@@ -35,18 +34,37 @@ Page({
       stats: {
         totalNotes,
         thisMonthNew,
-        aiUsage: 0,
         storageUsage: '本地缓存'
       }
     })
   },
 
   onTapSetting() {
-    wx.showToast({ title: '设置页可按需扩展', icon: 'none' })
+    wx.navigateTo({ url: '/pages/settings/settings' })
+  },
+
+  onTapEditProfile() {
+    wx.navigateTo({ url: '/pages/profileEdit/profileEdit' })
   },
 
   onTapMenu(e) {
     const action = e.currentTarget.dataset.action
+    if (action === '设置') {
+      wx.navigateTo({ url: '/pages/settings/settings' })
+      return
+    }
+    if (action === '使用帮助') {
+      wx.navigateTo({ url: '/pages/help/help' })
+      return
+    }
+    if (action === '关于我们') {
+      wx.navigateTo({ url: '/pages/about/about' })
+      return
+    }
+    if (action === '回收站') {
+      wx.navigateTo({ url: '/pages/recycle/recycle' })
+      return
+    }
     wx.showToast({ title: `${action} 功能待实现`, icon: 'none' })
   },
 

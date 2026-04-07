@@ -2,7 +2,8 @@
   <view wx:if="{{expandMenu}}" class="action-mask" bindtap="onMaskTap">
     <view class="action-panel" catchtap="onPanelTap">
       <view class="action-item" bindtap="onTapNewNote">新建笔记</view>
-      <view class="action-item" bindtap="onTapAI">AI问答</view>
+      <view class="action-item" bindtap="onTapRecycle">回收站</view>
+      <view class="action-item" bindtap="onTapAI">AI智能问答</view>
     </view>
   </view>
 

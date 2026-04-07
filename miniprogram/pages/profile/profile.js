@@ -11,7 +11,6 @@ Page({
     stats: {
       totalNotes: 0,
       thisMonthNew: 0,
-      aiUsage: 0,
       storageUsage: '—'
     }
   },
@@ -34,7 +33,6 @@ Page({
       stats: {
         totalNotes,
         thisMonthNew,
-        aiUsage: 0,
         storageUsage: '本地缓存'
       }
     })

@@ -1,0 +1,30 @@
+<view class="page-container">
+  <view class="page-header">
+    <view>
+      <view class="page-title">回收站</view>
+      <view class="page-subtitle">可还原已删除笔记，或彻底删除</view>
+    </view>
+    <button class="btn-secondary btn-small" bindtap="onClearAll">清空</button>
+  </view>
+
+  <view class="section" wx:if="{{list.length}}">
+    <view class="card recycle-card" wx:for="{{list}}" wx:key="id">
+      <view class="recycle-title">{{item.title}}</view>
+      <view class="recycle-meta">删除时间：{{item.deleteTimeText}}</view>
+      <view class="recycle-meta">更新时间：{{item.updateTimeText}}</view>
+      <view class="btn-group recycle-actions">
+        <button class="btn-secondary btn-small" data-id="{{item.id}}" bindtap="onRestore">还原</button>
+        <button class="btn-secondary btn-small btn-danger" data-id="{{item.id}}" bindtap="onDeletePermanent">彻底删除</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="section" wx:else>
+    <view class="card ajc empty-state">
+      <view>
+        <view class="empty-title">回收站为空</view>
+        <view class="empty-desc">已删除的笔记会显示在这里。</view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -178,6 +178,104 @@
   font-size: 24rpx;
 }
 
+.note-picker-bar {
+  width: 100%;
+  padding-bottom: 12rpx;
+}
+
+.note-picker-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.note-picker-title {
+  font-size: 22rpx;
+  color: #64748b;
+}
+
+.note-picker-ops {
+  display: flex;
+  align-items: center;
+  gap: 14rpx;
+}
+
+.note-op {
+  font-size: 22rpx;
+  color: #64748b;
+}
+
+.note-op-main {
+  color: #7c3aed;
+}
+
+.note-picker-list {
+  margin-top: 10rpx;
+  max-height: 260rpx;
+  overflow: hidden;
+  border: 1px solid #f0f0f0;
+  border-radius: 12rpx;
+  background: #ffffff;
+}
+
+.note-picker-item {
+  display: flex;
+  align-items: flex-start;
+  padding: 12rpx;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.note-picker-item:last-child {
+  border-bottom: none;
+}
+
+.note-picker-check {
+  width: 30rpx;
+  height: 30rpx;
+  border-radius: 6rpx;
+  border: 2rpx solid #94a3b8;
+  background: #ffffff;
+  margin-right: 10rpx;
+  margin-top: 2rpx;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.note-picker-check-on {
+  border-color: #6c5ce7;
+  background: #6c5ce7;
+}
+
+.note-picker-check-mark {
+  color: #ffffff;
+  font-size: 20rpx;
+  line-height: 1;
+  font-weight: 600;
+}
+
+.note-picker-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.note-picker-item-title {
+  font-size: 24rpx;
+  color: #1f2937;
+}
+
+.note-picker-item-preview {
+  font-size: 22rpx;
+  color: #94a3b8;
+  margin-top: 4rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .attach-tag-bar {
   width: 100%;
   padding-bottom: 12rpx;

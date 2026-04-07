@@ -1,11 +1,15 @@
 <view class="home-page">
-  <!-- 顶部：头像、云友 ID、产品名（保留） -->
+  <!-- 顶部：头像、昵称、产品名 -->
   <view class="top-bar">
     <view class="top-left">
-      <view class="avatar" bindtap="goProfile">Y</view>
+      <image wx:if="{{userInfo.avatarUrl}}"
+             class="avatar avatar-image"
+             src="{{userInfo.avatarUrl}}"
+             mode="aspectFill"
+             bindtap="goProfile" />
+      <view wx:else class="avatar avatar-text" bindtap="goProfile">{{userInfo.avatarLetter}}</view>
       <view class="user-info">
-        <view class="user-id-label">云友 ID</view>
-        <view class="user-id">#A93F</view>
+        <view class="user-nickname">{{userInfo.nickName}}</view>
       </view>
     </view>
     <view class="top-right">
@@ -26,9 +30,6 @@
                placeholder="搜索标题、内容或标签"
                value="{{searchText}}"
                bindinput="onSearchInput" />
-      </view>
-      <view class="home-actions-row">
-        <button class="btn-primary btn-small" bindtap="onTapNew">新建</button>
       </view>
     </view>
   </view>

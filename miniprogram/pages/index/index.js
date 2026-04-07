@@ -23,11 +23,17 @@ function getCategoryTag(tags) {
 
 Page({
   data: {
+    userInfo: {
+      nickName: '',
+      avatarUrl: '',
+      avatarLetter: '用'
+    },
     searchText: '',
     activeCategoryId: 'all',
     categories: [],
     notes: [],
-    filteredNotes: []
+    filteredNotes: [],
+    recycleCount: 0
   },
 
   goProfile() {
@@ -46,11 +52,20 @@ Page({
   },
 
   loadData() {
+    const raw = dataService.getUserInfo() || {}
+    const nickName = String(raw.nickName || '').trim() || '未设置昵称'
+    const userInfo = Object.assign({}, raw, {
+      nickName,
+      avatarLetter: nickName.charAt(0).toUpperCase()
+    })
     const categories = dataService.getCategories()
     const notes = dataService.getNotes(true)
+    const recycleCount = dataService.getDeletedNotes().length
     this.setData({
+      userInfo,
       categories,
-      notes: notes.filter((n) => n.status !== 'deleted')
+      notes: notes.filter((n) => n.status !== 'deleted'),
+      recycleCount
     })
     this.applyFilter()
   },
@@ -137,18 +152,22 @@ Page({
     }
     wx.showModal({
       title: '删除笔记',
-      content: '确定永久删除这条笔记？删除后不可恢复。',
-      confirmText: '删除',
+      content: '确定将该笔记移入回收站？',
+      confirmText: '移入',
       cancelText: '取消',
       confirmColor: '#dc2626',
       success: (res) => {
         if (res.confirm) {
-          dataService.hardDeleteNote(id)
-          wx.showToast({ title: '已删除', icon: 'success' })
+          dataService.softDeleteNote(id)
+          wx.showToast({ title: '已移入回收站', icon: 'success' })
           this.loadData()
         }
       }
     })
+  },
+
+  onTapRecycle() {
+    wx.navigateTo({ url: '/pages/recycle/recycle' })
   },
 
   onTapNew() {

@@ -1,0 +1,24 @@
+.name {
+  font-size: 34rpx;
+  font-weight: 700;
+  color: #333;
+}
+
+.version {
+  margin-top: 8rpx;
+  font-size: 24rpx;
+  color: #888;
+}
+
+.intro {
+  margin-top: 16rpx;
+  font-size: 26rpx;
+  color: #666;
+  line-height: 1.7;
+}
+
+.line {
+  font-size: 24rpx;
+  color: #666;
+  margin-bottom: 8rpx;
+}

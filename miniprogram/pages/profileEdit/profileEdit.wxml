@@ -1,0 +1,35 @@
+<view class="page-container">
+  <view class="page-header">
+    <view>
+      <view class="page-title">编辑资料</view>
+      <view class="page-subtitle">更新头像与昵称</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card">
+      <view class="avatar-wrap">
+        <image class="avatar" src="{{avatarUrl}}" mode="aspectFill"></image>
+      </view>
+      <button class="btn-secondary btn-small" bindtap="onChooseAvatar">更换头像</button>
+
+      <view class="field-label">昵称</view>
+      <input
+        class="input-modern"
+        placeholder="请输入昵称"
+        value="{{nickName}}"
+        maxlength="20"
+        bindinput="onInputNickName"
+      />
+
+      <view class="field-label">微信号</view>
+      <input class="input-modern" value="{{wechatId}}" disabled />
+    </view>
+  </view>
+
+  <view class="fixed-footer">
+    <view class="btn-group">
+      <button class="btn-primary" bindtap="onSave">保存</button>
+    </view>
+  </view>
+</view>

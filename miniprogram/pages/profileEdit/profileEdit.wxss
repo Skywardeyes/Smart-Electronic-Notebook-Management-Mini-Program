@@ -1,0 +1,25 @@
+.avatar-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 8rpx 0 18rpx;
+}
+
+.avatar {
+  width: 150rpx;
+  height: 150rpx;
+  border-radius: 50%;
+  background: #f3f4f6;
+}
+
+.field-label {
+  margin-top: 18rpx;
+  margin-bottom: 8rpx;
+  font-size: 24rpx;
+  color: #666666;
+}
+
+.input-modern {
+  min-height: 92rpx;
+  padding-top: 24rpx;
+  padding-bottom: 24rpx;
+}

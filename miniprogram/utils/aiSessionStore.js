@@ -168,6 +168,16 @@ function purgeAllDeletedSessions() {
   saveSessions(kept)
 }
 
+/** 清空全部 AI 会话（含回收站）及本地会话文件，用于设置页「清理历史会话」 */
+function clearAllSessions() {
+  loadSessionsRaw().forEach((s) => {
+    if (s && s.id) unlinkSessionFile(s.id)
+  })
+  try {
+    wx.removeStorageSync(STORAGE_KEY)
+  } catch (e) {}
+}
+
 module.exports = {
   STORAGE_KEY,
   STATUS_NORMAL,
@@ -187,5 +197,6 @@ module.exports = {
   restoreSession,
   hardDeleteSession,
   purgeAllDeletedSessions,
+  clearAllSessions,
   filePathForSession
 }

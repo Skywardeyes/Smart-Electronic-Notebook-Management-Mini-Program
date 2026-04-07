@@ -1,0 +1,40 @@
+.recycle-card {
+  margin-bottom: 16rpx;
+}
+
+.recycle-title {
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #333333;
+  margin-bottom: 6rpx;
+}
+
+.recycle-meta {
+  font-size: 24rpx;
+  color: #888888;
+}
+
+.recycle-actions {
+  margin-top: 14rpx;
+}
+
+.btn-danger {
+  color: #dc2626;
+  border-color: #fecaca;
+}
+
+.empty-state {
+  min-height: 220rpx;
+}
+
+.empty-title {
+  text-align: center;
+  font-size: 30rpx;
+  margin-bottom: 8rpx;
+}
+
+.empty-desc {
+  text-align: center;
+  font-size: 26rpx;
+  color: #999999;
+}

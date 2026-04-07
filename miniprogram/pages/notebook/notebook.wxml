@@ -13,7 +13,7 @@
       <view class="profile-info">
         <view class="nickname">{{userInfo.nickName || '未登录用户'}}</view>
         <view class="wechat-id text-muted">微信号：{{userInfo.wechatId || '—'}}</view>
-        <button class="btn-secondary btn-small edit-btn" bindtap="onTapSetting">编辑资料</button>
+        <button class="btn-secondary btn-small edit-btn" bindtap="onTapEditProfile">编辑资料</button>
       </view>
     </view>
   </view>
@@ -27,10 +27,6 @@
       <view class="stats-item">
         <view class="stats-number">{{stats.thisMonthNew}}</view>
         <view class="stats-label">本月新增</view>
-      </view>
-      <view class="stats-item">
-        <view class="stats-number">{{stats.aiUsage}}</view>
-        <view class="stats-label">AI 使用次数</view>
       </view>
       <view class="stats-item">
         <view class="stats-number">{{stats.storageUsage}}</view>
@@ -49,6 +45,9 @@
       </view>
       <view class="menu-item" data-action="关于我们" bindtap="onTapMenu">
         <text>关于我们</text>
+      </view>
+      <view class="menu-item" data-action="回收站" bindtap="onTapMenu">
+        <text>回收站</text>
       </view>
     </view>
   </view>

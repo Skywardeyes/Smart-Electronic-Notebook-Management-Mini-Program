@@ -49,6 +49,13 @@ Component({
       })
     },
 
+    onTapRecycle() {
+      this.setData({ expandMenu: false })
+      wx.navigateTo({
+        url: '/pages/recycle/recycle'
+      })
+    },
+
     onTapAI() {
       this.setData({ expandMenu: false })
       wx.navigateTo({

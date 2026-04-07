@@ -22,6 +22,15 @@
   width: 72rpx;
   height: 72rpx;
   border-radius: 50%;
+  margin-right: 20rpx;
+  flex-shrink: 0;
+}
+
+.avatar-image {
+  background-color: #f3f4f6;
+}
+
+.avatar-text {
   background: linear-gradient(135deg, #a855f7, #6366f1);
   color: #ffffff;
   display: flex;
@@ -29,24 +38,23 @@
   justify-content: center;
   font-size: 32rpx;
   font-weight: 600;
-  margin-right: 20rpx;
 }
 
 .user-info {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-width: 0;
 }
 
-.user-id-label {
-  font-size: 22rpx;
-  color: #9ca3af;
-}
-
-.user-id {
-  margin-top: 4rpx;
-  font-size: 26rpx;
-  color: #4b5563;
+.user-nickname {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 280rpx;
 }
 
 .top-icons-left {
@@ -87,14 +95,6 @@
 }
 
 /* —— 原文件夹页样式 —— */
-.home-actions-row {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-end;
-  margin-top: 20rpx;
-}
-
 .search-box {
   display: flex;
   flex-direction: row;
@@ -236,3 +236,4 @@
   font-size: 26rpx;
   color: #999999;
 }
+

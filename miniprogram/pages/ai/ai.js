@@ -3,6 +3,32 @@ const aiPrefill = require('../../utils/aiPrefill.js')
 const dataService = require('../../utils/dataService.js')
 const aiSessionStore = require('../../utils/aiSessionStore.js')
 
+const MAX_NOTE_SUMMARY_CHARS = 220
+const MAX_CONTEXT_CHARS = 3000
+
+function htmlToPlainText(html) {
+  return String(html || '')
+    .replace(/<style[\s\S]*?<\/style>/gi, '')
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|li|h1|h2|h3|h4|h5|h6)>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
+/** WXML 中不宜用 indexOf 判断选中，给每条笔记打上布尔标记供模板绑定 */
+function withPickerSelection(list, selectedIds) {
+  const set = new Set((selectedIds || []).map((id) => String(id)))
+  return (list || []).map((n) =>
+    Object.assign({}, n, { pickerSelected: set.has(String(n.id)) })
+  )
+}
+
 Page({
   data: {
     mode: 'qa', // qa | polish
@@ -14,7 +40,12 @@ Page({
     resultText: '',
     loading: false,
     qaHistory: [],
-    attachTag: null
+    attachTag: null,
+    notePickerOpen: false,
+    allNotes: [],
+    selectedNoteIds: [],
+    selectedNoteCount: 0,
+    contextTruncated: false
   },
 
   formatSessionDate(ts) {
@@ -88,6 +119,10 @@ Page({
       inputText: '',
       resultText: '',
       attachTag: attachPayload,
+      selectedNoteIds: [],
+      selectedNoteCount: 0,
+      contextTruncated: false,
+      allNotes: withPickerSelection(this.data.allNotes, []),
       savedSessions: this.decorateSessions(aiSessionStore.loadActiveSessions())
     })
   },
@@ -101,6 +136,7 @@ Page({
       currentSessionId: id,
       savedSessions: this.decorateSessions(aiSessionStore.loadActiveSessions())
     })
+    this.loadSelectableNotes()
   },
 
   onShow() {
@@ -118,6 +154,7 @@ Page({
     this.setData({
       savedSessions: this.decorateSessions(aiSessionStore.loadActiveSessions())
     })
+    this.loadSelectableNotes()
   },
 
   onUnload() {
@@ -143,6 +180,11 @@ Page({
       inputText: '',
       resultText: '',
       attachTag: null,
+      notePickerOpen: false,
+      selectedNoteIds: [],
+      selectedNoteCount: 0,
+      contextTruncated: false,
+      allNotes: withPickerSelection(this.data.allNotes, []),
       savedSessions: this.decorateSessions(aiSessionStore.loadActiveSessions())
     })
   },
@@ -152,6 +194,7 @@ Page({
     if (type === 'history') {
       this.setData({
         contextType: 'history',
+        notePickerOpen: false,
         savedSessions: this.decorateSessions(aiSessionStore.loadActiveSessions())
       })
       return
@@ -210,12 +253,121 @@ Page({
     this.setData({ inputText: e.detail.value })
   },
 
+  loadSelectableNotes() {
+    const list = dataService
+      .getNotes(false)
+      .slice()
+      .sort((a, b) => (b.updateTime || '').localeCompare(a.updateTime || ''))
+      .map((n) => {
+        const title = String(n.title || '未命名笔记').trim() || '未命名笔记'
+        const plain = htmlToPlainText(n.summary || '') || htmlToPlainText(n.content || '')
+        const preview = plain.length > 80 ? `${plain.slice(0, 80)}...` : plain
+        return {
+          id: n.id,
+          title,
+          summary: plain,
+          preview
+        }
+      })
+    const existed = new Set(list.map((x) => x.id))
+    const selected = (this.data.selectedNoteIds || []).filter((id) => existed.has(id))
+    this.setData({
+      allNotes: withPickerSelection(list, selected),
+      selectedNoteIds: selected,
+      selectedNoteCount: selected.length
+    })
+  },
+
+  toggleNotePicker() {
+    if (this.data.mode !== 'qa' || this.data.contextType === 'history') return
+    this.setData({ notePickerOpen: !this.data.notePickerOpen })
+  },
+
+  toggleNoteSelect(e) {
+    if (this.data.mode !== 'qa') return
+    const id = String(e.currentTarget.dataset.id || '')
+    if (!id) return
+    const set = new Set(this.data.selectedNoteIds || [])
+    if (set.has(id)) set.delete(id)
+    else set.add(id)
+    const selectedNoteIds = Array.from(set)
+    this.setData({
+      selectedNoteIds,
+      selectedNoteCount: selectedNoteIds.length,
+      contextTruncated: false,
+      allNotes: withPickerSelection(this.data.allNotes, selectedNoteIds)
+    })
+    if (this.data.attachTag && selectedNoteIds.length) {
+      aiPrefill.clearAttachResources(this.data.attachTag)
+      this.setData({ attachTag: null })
+    }
+  },
+
+  toggleSelectAllNotes() {
+    if (this.data.mode !== 'qa') return
+    const allIds = (this.data.allNotes || []).map((n) => n.id)
+    if (!allIds.length) return
+    const allSelected = (this.data.selectedNoteIds || []).length === allIds.length
+    const next = allSelected ? [] : allIds
+    this.setData({
+      selectedNoteIds: next,
+      selectedNoteCount: next.length,
+      contextTruncated: false,
+      allNotes: withPickerSelection(this.data.allNotes, next)
+    })
+    if (this.data.attachTag && next.length) {
+      aiPrefill.clearAttachResources(this.data.attachTag)
+      this.setData({ attachTag: null })
+    }
+  },
+
+  clearSelectedNotes() {
+    this.setData({
+      selectedNoteIds: [],
+      selectedNoteCount: 0,
+      contextTruncated: false,
+      allNotes: withPickerSelection(this.data.allNotes, [])
+    })
+  },
+
   onRemoveAttach() {
     const attach = this.data.attachTag
     if (!attach) return
     aiPrefill.clearAttachResources(attach)
     this.setData({ attachTag: null })
     wx.showToast({ title: '已移除上下文', icon: 'none' })
+  },
+
+  buildSelectedNotesPrompt(question) {
+    const q = String(question || '').trim()
+    if (!q) return null
+    const selected = new Set(this.data.selectedNoteIds || [])
+    if (!selected.size) return null
+    const picked = (this.data.allNotes || []).filter((n) => selected.has(n.id))
+    let block = ''
+    picked.forEach((n, idx) => {
+      const summaryRaw = String(n.summary || '').trim()
+      const summary =
+        summaryRaw.length > MAX_NOTE_SUMMARY_CHARS
+          ? `${summaryRaw.slice(0, MAX_NOTE_SUMMARY_CHARS)}...`
+          : summaryRaw
+      block += `【笔记${idx + 1}】\n标题: ${n.title}\n摘要: ${summary || '无'}\n\n`
+    })
+    let truncated = false
+    if (block.length > MAX_CONTEXT_CHARS) {
+      block = `${block.slice(0, MAX_CONTEXT_CHARS)}\n...(已截断)`
+      truncated = true
+    }
+    const merged =
+      '以下是用户选择的笔记信息（标题+摘要），请优先基于这些信息回答问题；若信息不足请明确说明。\n\n' +
+      block +
+      '\n用户问题：\n' +
+      q
+    return {
+      merged,
+      displayUser: `【已选${picked.length}篇笔记】\n${q}`,
+      truncated
+    }
   },
 
   buildMergedQA(userQuestion) {
@@ -267,16 +419,18 @@ Page({
     if (this.data.contextType === 'history') {
       this.setData({ contextType: 'none' })
     }
-    const built = this.buildMergedQA(userQuestion)
+    const selectedBuilt = this.buildSelectedNotesPrompt(userQuestion)
+    const built = selectedBuilt || this.buildMergedQA(userQuestion)
     if (!built) return
     if (built.error) {
       wx.showToast({ title: built.error, icon: 'none' })
       return
     }
     const attachTag = this.data.attachTag
+    this.setData({ contextTruncated: !!built.truncated })
     this.setData({ loading: true })
     try {
-      const answer = attachTag
+      const answer = attachTag || (this.data.selectedNoteIds || []).length
         ? await aiService.requestAI(built.merged, { max_tokens: 512 })
         : await aiService.askQuestion(built.merged, '')
       const history = this.data.qaHistory.concat([
@@ -290,6 +444,7 @@ Page({
         qaHistory: history,
         inputText: '',
         attachTag: null,
+        notePickerOpen: false,
         loading: false
       })
       this.persistCurrentQASession()

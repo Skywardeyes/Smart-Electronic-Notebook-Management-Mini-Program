@@ -181,6 +181,7 @@ Page({
     this._editorCtx = null
     this._pendingContentHtml = '<p><br></p>'
     this._lastSavedSignature = ''
+    this.refreshAutoSaveSettings()
     this.setData({ mode, noteId: id })
     if (id && globalMode === 'edit') {
       delete app.globalData.editorNoteId
@@ -206,6 +207,14 @@ Page({
       this._editingNoteId = ''
       this._draftKey = generateDraftKey()
     }
+  },
+
+  refreshAutoSaveSettings() {
+    const settings = dataService.getSettings ? dataService.getSettings() : null
+    const enabled = !settings || settings.autoSaveEnabled !== false
+    const sec = settings && settings.autoSaveIntervalSec ? Number(settings.autoSaveIntervalSec) : 3
+    this._autoSaveEnabled = enabled
+    this._autoSaveDelayMs = Math.max(1000, (Number.isFinite(sec) ? sec : 3) * 1000)
   },
 
   onShow() {
@@ -526,12 +535,13 @@ Page({
   },
 
   scheduleAutoSave() {
+    if (!this._autoSaveEnabled) return
     if (autoSaveTimer) {
       clearTimeout(autoSaveTimer)
     }
     autoSaveTimer = setTimeout(() => {
       this.saveNote({ silent: true })
-    }, 3000)
+    }, this._autoSaveDelayMs || 3000)
   },
 
   saveNote(options = {}) {

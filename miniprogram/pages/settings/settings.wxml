@@ -1,0 +1,45 @@
+<view class="page-container">
+  <view class="page-header">
+    <view>
+      <view class="page-title">设置</view>
+      <view class="page-subtitle">个性化与缓存管理</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card">
+      <view class="switch-row">
+        <view>
+          <view class="section-title">自动保存</view>
+          <view class="desc">编辑过程中自动保存笔记内容</view>
+        </view>
+        <switch checked="{{settings.autoSaveEnabled}}" bindchange="onToggleAutoSave" />
+      </view>
+      <view class="desc" wx:if="{{settings.autoSaveEnabled}}">保存间隔</view>
+      <view class="pill-row" wx:if="{{settings.autoSaveEnabled}}">
+        <view
+          wx:for="{{intervalItems}}"
+          wx:key="*this"
+          class="pill {{settings.autoSaveIntervalSec===item ? 'pill-active' : ''}}"
+          data-value="{{item}}"
+          bindtap="onPickInterval"
+        >
+          {{item}} 秒
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card cache-card">
+      <view class="section-title">存储管理</view>
+      <view class="desc cache-intro">以下操作均不会删除笔记、分类、个人资料与设置。</view>
+
+      <button class="btn-secondary cache-action-btn" bindtap="onClearTempCache">清理临时缓存</button>
+      <view class="desc">清除本地草稿缓存与同步时间等临时数据，不影响 AI 历史对话。</view>
+
+      <button class="btn-secondary cache-action-btn cache-action-btn-spaced" bindtap="onClearHistorySessions">清理历史会话</button>
+      <view class="desc">清空 AI 问答历史记录（含本地导出文件）及旧版对话存储。</view>
+    </view>
+  </view>
+</view>

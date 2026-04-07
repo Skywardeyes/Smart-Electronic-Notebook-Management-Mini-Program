@@ -1,0 +1,23 @@
+<view class="page-container">
+  <view class="page-header">
+    <view>
+      <view class="page-title">关于我们</view>
+      <view class="page-subtitle">产品信息与联系方式</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card">
+      <view class="name">{{appName}}</view>
+      <view class="version">版本：{{version}}</view>
+      <view class="intro">{{intro}}</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card">
+      <view class="line">反馈邮箱：support@example.com</view>
+      <view class="line">版权信息：Copyright © 2026 智能云笔记</view>
+    </view>
+  </view>
+</view>

@@ -1,3 +1,5 @@
+const aiSessionStore = require('./aiSessionStore.js')
+
 const STORAGE_KEYS = {
   USER_INFO: 'userInfo',
   NOTES: 'notes',
@@ -205,6 +207,63 @@ function getUserInfo() {
   return mock
 }
 
+function saveUserInfo(next) {
+  const base = getUserInfo()
+  const merged = Object.assign({}, base, next || {})
+  saveObject(STORAGE_KEYS.USER_INFO, merged)
+  return merged
+}
+
+function getSettings() {
+  const base = {
+    autoSaveEnabled: true,
+    autoSaveIntervalSec: 3
+  }
+  const raw = loadObject(STORAGE_KEYS.SETTINGS)
+  const merged = Object.assign({}, base, raw || {})
+  delete merged.fontSize
+  const sec = Number(merged.autoSaveIntervalSec)
+  merged.autoSaveIntervalSec = Number.isFinite(sec) ? Math.max(1, Math.min(30, sec)) : 3
+  merged.autoSaveEnabled = merged.autoSaveEnabled !== false
+  return merged
+}
+
+function saveSettings(next) {
+  const merged = Object.assign({}, getSettings(), next || {})
+  const saved = getSettingsFromCandidate(merged)
+  saveObject(STORAGE_KEYS.SETTINGS, saved)
+  return saved
+}
+
+function getSettingsFromCandidate(candidate) {
+  const c = Object.assign({}, candidate || {})
+  delete c.fontSize
+  const sec = Number(c.autoSaveIntervalSec)
+  c.autoSaveIntervalSec = Number.isFinite(sec) ? Math.max(1, Math.min(30, sec)) : 3
+  c.autoSaveEnabled = c.autoSaveEnabled !== false
+  return {
+    autoSaveEnabled: c.autoSaveEnabled,
+    autoSaveIntervalSec: c.autoSaveIntervalSec
+  }
+}
+
+/** 仅临时数据：草稿、同步时间等，不清理 AI 历史会话 */
+function clearTempCache() {
+  ;[STORAGE_KEYS.DRAFTS, STORAGE_KEYS.LAST_SYNC_TIME].forEach((k) => {
+    try {
+      wx.removeStorageSync(k)
+    } catch (e) {}
+  })
+}
+
+/** 历史会话：旧版 conversationHistory 存储 + 当前 AI 问答会话列表与导出文件 */
+function clearHistorySessions() {
+  try {
+    wx.removeStorageSync(STORAGE_KEYS.CONVERSATION_HISTORY)
+  } catch (e) {}
+  aiSessionStore.clearAllSessions()
+}
+
 module.exports = {
   STORAGE_KEYS,
   getNotes,
@@ -218,6 +277,11 @@ module.exports = {
   getRecentNotes,
   getCategories,
   saveCategories,
-  getUserInfo
+  getUserInfo,
+  saveUserInfo,
+  getSettings,
+  saveSettings,
+  clearTempCache,
+  clearHistorySessions
 }
 

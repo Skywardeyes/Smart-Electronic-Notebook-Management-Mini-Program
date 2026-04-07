@@ -29,10 +29,6 @@
         <view class="stats-label">本月新增</view>
       </view>
       <view class="stats-item">
-        <view class="stats-number">{{stats.aiUsage}}</view>
-        <view class="stats-label">AI 使用次数</view>
-      </view>
-      <view class="stats-item">
         <view class="stats-number">{{stats.storageUsage}}</view>
         <view class="stats-label">存储空间</view>
       </view>
